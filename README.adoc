@@ -1,0 +1,5 @@
+= PostgreSQL Fingerprint Storage Plugin
+
+This plugin is under development.
+Please refer to https://www.jenkins.io/projects/gsoc/2020/projects/external-fingerprint-storage/[project page]
+for current status.
