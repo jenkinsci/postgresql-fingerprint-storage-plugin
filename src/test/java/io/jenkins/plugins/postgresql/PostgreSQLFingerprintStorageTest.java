@@ -1,0 +1,132 @@
+/*
+ * The MIT License
+ *
+ * Copyright (c) 2020, Jenkins project contributors
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+package io.jenkins.plugins.postgresql;
+
+import com.cloudbees.plugins.credentials.CredentialsScope;
+import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
+import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
+import hudson.Util;
+import hudson.model.Fingerprint;
+import jenkins.fingerprints.FingerprintStorage;
+import jenkins.fingerprints.GlobalFingerprintConfiguration;
+import org.junit.Rule;
+import org.junit.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.testcontainers.containers.PostgreSQLContainer;
+
+import java.io.IOException;
+
+import static org.hamcrest.CoreMatchers.hasItem;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNot.not;
+
+public class PostgreSQLFingerprintStorageTest {
+
+    @Rule
+    public JenkinsRule j = new JenkinsRule();
+
+    @Rule
+    public PostgreSQLContainer postgres = new PostgreSQLContainer();
+
+    public void setConfiguration() throws IOException {
+        StandardUsernamePasswordCredentials standardUsernamePasswordCredentials = new UsernamePasswordCredentialsImpl(
+                CredentialsScope.SYSTEM,
+                "credentialId",
+                null,
+                postgres.getUsername(),
+                postgres.getPassword()
+        );
+        SystemCredentialsProvider.getInstance().getCredentials().add(standardUsernamePasswordCredentials);
+        SystemCredentialsProvider.getInstance().save();
+
+        PostgreSQLFingerprintStorage.get().setHost(postgres.getHost());
+        PostgreSQLFingerprintStorage.get().setPort(postgres.getFirstMappedPort());
+        PostgreSQLFingerprintStorage.get().setDatabaseName(postgres.getDatabaseName());
+        PostgreSQLFingerprintStorage.get().setCredentialsId(standardUsernamePasswordCredentials.getId());
+        GlobalFingerprintConfiguration.get().setStorage(PostgreSQLFingerprintStorage.get());
+    }
+
+    @Test
+    public void checkFingerprintStorageIsPostgreSQL() throws IOException {
+        setConfiguration();
+        Object fingerprintStorage = FingerprintStorage.get();
+        assertThat(fingerprintStorage, instanceOf(PostgreSQLFingerprintStorage.class));
+    }
+
+    @Test
+    public void roundTrip() throws IOException {
+        setConfiguration();
+        PostgreSQLSchemaManager.performSchemaInitialization();
+        String id = Util.getDigestOf("roundTrip");
+
+        Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+        fingerprintSaved.add("bar", 3);
+
+        Fingerprint fingerprintLoaded = Fingerprint.load(id);
+        assertThat(fingerprintLoaded, is(not(nullValue())));
+        assertThat(fingerprintSaved.toString(), is(equalTo(fingerprintLoaded.toString())));
+    }
+
+    @Test
+    public void loadingNonExistentFingerprintShouldReturnNull() throws IOException{
+        setConfiguration();
+        String id = Util.getDigestOf("loadingNonExistentFingerprintShouldReturnNull");
+        Fingerprint fingerprint = Fingerprint.load(id);
+        assertThat(fingerprint, is(nullValue()));
+    }
+
+    @Test(expected=IOException.class)
+    public void shouldFailWhenStoredObjectIsInvalidFingerprint() throws IOException {
+        setConfiguration();
+    }
+
+    @Test
+    public void shouldDeleteFingerprint() throws IOException {
+        setConfiguration();
+        String id = Util.getDigestOf("shouldDeleteFingerprint");
+        new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+        Fingerprint.delete(id);
+        Fingerprint fingerprintLoaded = Fingerprint.load(id);
+        assertThat(fingerprintLoaded, is(nullValue()));
+        Fingerprint.delete(id);
+        fingerprintLoaded = Fingerprint.load(id);
+        assertThat(fingerprintLoaded, is(nullValue()));
+    }
+
+    @Test
+    public void testIsReady() throws IOException {
+        setConfiguration();
+        FingerprintStorage fingerprintStorage = FingerprintStorage.get();
+        assertThat(fingerprintStorage.isReady(), is(false));
+        String id = Util.getDigestOf("testIsReady");
+        new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+        assertThat(fingerprintStorage.isReady(), is(true));
+    }
+
+}
