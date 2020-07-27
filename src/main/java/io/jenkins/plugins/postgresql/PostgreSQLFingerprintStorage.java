@@ -169,7 +169,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
 
             String json = JSONHandler.constructFingerprintJSON(fingerprintMetadata, usageMetadata);
 
-            fingerprint = (Fingerprint) getXStream().fromXML(json);
+            fingerprint = (Fingerprint) XStreamHandler.getXStream().fromXML(json);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Postgres failed in loading fingerprint: " + id, e);
         }
@@ -309,28 +309,6 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     @Extension
     public static class DescriptorImpl extends PostgreSQLFingerprintStorageDescriptor {
 
-    }
-
-    private static final XStream2 XSTREAM = new XStream2(new JettisonMappedXmlDriver());
-
-    @NonNull private static XStream2 getXStream() {
-        return XSTREAM;
-    }
-
-    static {
-        XSTREAM.setMode(XStream2.NO_REFERENCES);
-        XSTREAM.alias("fingerprint",Fingerprint.class);
-        XSTREAM.alias("range", Fingerprint.Range.class);
-        XSTREAM.alias("ranges", Fingerprint.RangeSet.class);
-        XSTREAM.registerConverter(new HexBinaryConverter(),10);
-        XSTREAM.registerConverter(new Fingerprint.RangeSet.ConverterImpl(
-                new CollectionConverter(XSTREAM.getMapper()) {
-                    @Override
-                    protected Object createCollection(Class type) {
-                        return new ArrayList();
-                    }
-                }
-        ),10);
     }
 
 }
