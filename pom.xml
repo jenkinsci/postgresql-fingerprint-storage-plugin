@@ -44,7 +44,7 @@ THE SOFTWARE.
         <useBeta>true</useBeta>
     </properties>
 
-    <name>PostgreSQL Fingerprint Storage Parent</name>
+    <name>PostgreSQL Fingerprint Storage Plugin</name>
     <description>Pluggable External Fingerprint Storage Client for PostgreSQL</description>
 
     <licenses>
