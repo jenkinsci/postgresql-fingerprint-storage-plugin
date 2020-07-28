@@ -52,6 +52,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jenkins.fingerprints.FingerprintStorageDescriptor;
+import net.sf.json.JSONArray;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -91,7 +92,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
         properties.setProperty("user", CredentialHelper.getUsernameFromCredential(standardUsernamePasswordCredentials));
         properties.setProperty("password", CredentialHelper.getPasswordFromCredential(standardUsernamePasswordCredentials));
         if (ssl) {
-            properties.setProperty("ssl", Boolean.toString(ssl));
+            properties.setProperty("ssl", Boolean.toString(true));
         }
         properties.setProperty("connectTimeout", Integer.toString(connectionTimeout));
         properties.setProperty("socketTimeout", Integer.toString(socketTimeout));
@@ -137,6 +138,8 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 }
             }
 
+
+
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -167,7 +170,14 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             Map<String, Fingerprint.RangeSet> usageMetadata = JSONHandler.extractUsageMetadata(resultSet);
             preparedStatement.close();
 
-            String json = JSONHandler.constructFingerprintJSON(fingerprintMetadata, usageMetadata);
+            preparedStatement = connection.prepareStatement(Queries.getQuery("select_fingerprint_facet_relation"));
+            preparedStatement.setString(1, id);
+            preparedStatement.setString(2, instanceId);
+            resultSet = preparedStatement.executeQuery();
+            JSONArray facets = JSONHandler.extractFacets(resultSet);
+            preparedStatement.close();
+
+            String json = JSONHandler.constructFingerprintJSON(fingerprintMetadata, usageMetadata, facets);
 
             fingerprint = (Fingerprint) XStreamHandler.getXStream().fromXML(json);
         } catch (SQLException e) {

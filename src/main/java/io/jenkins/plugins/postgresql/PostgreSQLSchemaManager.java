@@ -44,6 +44,11 @@ public class PostgreSQLSchemaManager {
             preparedStatement.execute();
             preparedStatement.close();
 
+            preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_facet_relation_table"));
+            preparedStatement.execute();
+            preparedStatement.close();
+
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();

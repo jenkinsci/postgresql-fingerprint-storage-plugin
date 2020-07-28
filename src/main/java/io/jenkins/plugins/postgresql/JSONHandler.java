@@ -25,6 +25,7 @@ package io.jenkins.plugins.postgresql;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Fingerprint;
+import jdk.nashorn.internal.parser.JSONParser;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
@@ -52,16 +53,18 @@ public class JSONHandler {
     }
 
     static String constructFingerprintJSON(Map<String, String> fingerprintMetadata,
-                                Map<String, Fingerprint.RangeSet> usageMetadata) {
+                                           Map<String, Fingerprint.RangeSet> usageMetadata,
+                                           JSONArray facets) {
         JSONObject json = new JSONObject();
         JSONObject fingerprint = new JSONObject();
         JSONArray md5sum = new JSONArray();
-        JSONArray facets = new JSONArray();
         JSONArray usages = new JSONArray();
 
         md5sum.add(fingerprintMetadata.get("id"));
 
-        facets.add("");
+        if (facets.size() == 0) {
+            facets.add("");
+        }
 
         if (usageMetadata.size() != 0) {
             for (Map.Entry<String, Fingerprint.RangeSet> usage : usageMetadata.entrySet()) {
@@ -78,6 +81,8 @@ public class JSONHandler {
         } else {
             usages.add("");
         }
+
+
 
         fingerprint.put("timestamp", fingerprintMetadata.get("timestamp"));
         fingerprint.put("fileName", fingerprintMetadata.get("filename"));
@@ -125,6 +130,23 @@ public class JSONHandler {
         }
 
         return Collections.unmodifiableMap(fingerprintMetadata);
+    }
+
+    static @NonNull JSONArray extractFacets(@NonNull ResultSet resultSet) throws SQLException {
+        JSONArray facets = new JSONArray();
+
+        while (resultSet.next()) {
+            String facetJSONString = resultSet.getString("facet");
+
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(facetJSONString);
+
+            facets.add(new JSONObject(facetJSONString));
+            new JSONObject(facetJSONString);
+
+        }
+
+        return facets;
     }
 
 }
