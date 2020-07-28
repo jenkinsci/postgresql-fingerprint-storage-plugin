@@ -95,6 +95,24 @@ public class PostgreSQLFingerprintStorageTest {
     }
 
     @Test
+    public void roundTripWithUsages() throws IOException {
+        setConfiguration();
+        PostgreSQLSchemaManager.performSchemaInitialization();
+        String id = Util.getDigestOf("roundTrip");
+
+        Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+        fingerprintSaved.add("a", 3);
+        fingerprintSaved.add("b", 33);
+        fingerprintSaved.add("c", 333);
+
+        System.out.println(XStreamHandler.getXStream().toXML(fingerprintSaved));
+
+        Fingerprint fingerprintLoaded = Fingerprint.load(id);
+        assertThat(fingerprintLoaded, is(not(nullValue())));
+        assertThat(fingerprintSaved.toString(), is(equalTo(fingerprintLoaded.toString())));
+    }
+
+    @Test
     public void loadingNonExistentFingerprintShouldReturnNull() throws IOException{
         setConfiguration();
         String id = Util.getDigestOf("loadingNonExistentFingerprintShouldReturnNull");

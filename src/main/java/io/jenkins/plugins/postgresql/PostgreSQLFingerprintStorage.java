@@ -104,8 +104,8 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
      * Saves the given fingerprint.
      */
     public synchronized void save(Fingerprint fingerprint) {
+        delete(fingerprint.getHashString());
         try (Connection connection = getConnection()) {
-            delete(fingerprint.getHashString());
             connection.setAutoCommit(false);
 
             PreparedStatement preparedStatement = connection.prepareStatement(Queries.getQuery("insert_fingerprint"));
@@ -148,6 +148,9 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
 
             List<String> facets = JSONHandler.extractFacets(fingerprint);
             for (String facet : facets) {
+                if (facet.equals("")) {
+                    break;
+                }
                 preparedStatement = connection.prepareStatement(
                         Queries.getQuery("insert_fingerprint_facet_relation"));
 

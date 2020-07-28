@@ -65,17 +65,19 @@ public class JSONHandler {
         }
 
         if (usageMetadata.size() != 0) {
-            for (Map.Entry<String, Fingerprint.RangeSet> usage : usageMetadata.entrySet()) {
-                JSONObject entry = new JSONObject();
+            JSONObject entry = new JSONObject();
+            JSONArray entryArray = new JSONArray();
 
+            for (Map.Entry<String, Fingerprint.RangeSet> usage : usageMetadata.entrySet()) {
                 JSONObject jobAndBuild = new JSONObject();
                 jobAndBuild.put("string", usage.getKey());
                 jobAndBuild.put("ranges", serialize(usage.getValue()));
 
-                entry.put("entry", jobAndBuild);
-
-                usages.put(entry);
+                entryArray.put(jobAndBuild);
             }
+
+            entry.put("entry", entryArray);
+            usages.put(entry);
         } else {
             usages.put("");
         }
