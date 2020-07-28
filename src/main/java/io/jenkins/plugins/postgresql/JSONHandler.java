@@ -31,9 +31,7 @@ import org.json.JSONObject;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class JSONHandler {
 
@@ -139,6 +137,19 @@ public class JSONHandler {
         }
 
         return facets;
+    }
+
+    static @NonNull List<String> extractFacets(@NonNull Fingerprint fingerprint) throws SQLException {
+        List<String> facetsString = new ArrayList<>();
+
+        JSONArray facets = (JSONArray) new JSONObject(XStreamHandler.getXStream().toXML(fingerprint)).get("facets");
+
+        for (Object facet : facets) {
+            facet = (JSONObject) facet;
+            facetsString.add(facet.toString());
+        }
+
+        return facetsString;
     }
 
 }

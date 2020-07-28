@@ -44,6 +44,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -53,6 +54,7 @@ import jenkins.fingerprints.FingerprintStorageDescriptor;
 import org.json.JSONArray;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 
+import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
@@ -136,7 +138,19 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 }
             }
 
+            List<String> facets = JSONHandler.extractFacets(fingerprint);
+            for (String facet : facets) {
+                preparedStatement = connection.prepareStatement(
+                        Queries.getQuery("insert_fingerprint_facet_relation"));
 
+                preparedStatement.setString(1, fingerprint.getHashString());
+                preparedStatement.setString(2, instanceId);
+                preparedStatement.setString(3, facet);
+
+                preparedStatement.execute();
+                preparedStatement.close();
+
+            }
 
             connection.commit();
         } catch (SQLException e) {
