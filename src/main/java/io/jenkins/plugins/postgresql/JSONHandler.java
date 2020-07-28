@@ -25,7 +25,6 @@ package io.jenkins.plugins.postgresql;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Fingerprint;
-import jdk.nashorn.internal.parser.JSONParser;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -144,19 +143,38 @@ public class JSONHandler {
         return facets;
     }
 
-    static @NonNull List<String> extractFacets(@NonNull Fingerprint fingerprint) throws SQLException {
-        List<String> facetsString = new ArrayList<>();
+    static @NonNull Map<String, List<String>> extractFacets(@NonNull Fingerprint fingerprint) throws SQLException {
+        Map<String, List<String>> facets = new HashMap<>();
 
         JSONObject fingerprintJSON = new JSONObject(XStreamHandler.getXStream().toXML(fingerprint))
                 .getJSONObject("fingerprint");
 
         JSONArray facetsJSON = fingerprintJSON.getJSONArray("facets");
 
-        for (Object facet : facetsJSON) {
-            facetsString.add(facet.toString());
+        System.out.println(facetsJSON.get(0));
+
+        if (facetsJSON.get(0).equals("")) {
+            return Collections.emptyMap();
         }
 
-        return facetsString;
+        for (Object facetObject : facetsJSON.toList()) {
+            JSONObject facet = (JSONObject) facetObject;
+
+            for (String facetName : facet.keySet()) {
+                JSONArray facetEntries = facet.getJSONArray(facetName);
+                List<String> facetEntriesList = new ArrayList<>();
+
+                for (Object facetEntryObject : facetEntries) {
+                    JSONObject facetEntry = (JSONObject) facetEntryObject;
+                    facetEntriesList.add(facetEntry.toString());
+                }
+
+                facets.put(facetName, Collections.unmodifiableList(facetEntriesList));
+            }
+
+        }
+
+        return Collections.unmodifiableMap(facets);
     }
 
 }

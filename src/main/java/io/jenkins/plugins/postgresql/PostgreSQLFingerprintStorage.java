@@ -144,20 +144,23 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 }
             }
 
-            List<String> facets = JSONHandler.extractFacets(fingerprint);
-            for (String facet : facets) {
-                if (facet.equals("")) {
-                    break;
+            Map<String, List<String>> facets = JSONHandler.extractFacets(fingerprint);
+            for (Map.Entry<String, List<String>> entry : facets.entrySet()) {
+                String facetName = entry.getKey();
+                List<String> facetEntries = entry.getValue();
+
+                for (String facetEntry : facetEntries) {
+                    preparedStatement = connection.prepareStatement(
+                            Queries.getQuery("insert_fingerprint_facet_relation"));
+
+                    preparedStatement.setString(1, fingerprint.getHashString());
+                    preparedStatement.setString(2, instanceId);
+                    preparedStatement.setString(3, facetName);
+                    preparedStatement.setString(4, facetEntry);
+
+                    preparedStatement.execute();
+                    preparedStatement.close();
                 }
-                preparedStatement = connection.prepareStatement(
-                        Queries.getQuery("insert_fingerprint_facet_relation"));
-
-                preparedStatement.setString(1, fingerprint.getHashString());
-                preparedStatement.setString(2, instanceId);
-                preparedStatement.setString(3, facet);
-
-                preparedStatement.execute();
-                preparedStatement.close();
 
             }
 
