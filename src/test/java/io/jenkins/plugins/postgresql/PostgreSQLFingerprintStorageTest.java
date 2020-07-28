@@ -31,6 +31,7 @@ import hudson.Util;
 import hudson.model.Fingerprint;
 import jenkins.fingerprints.FingerprintStorage;
 import jenkins.fingerprints.GlobalFingerprintConfiguration;
+import jenkins.model.FingerprintFacet;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -127,6 +128,19 @@ public class PostgreSQLFingerprintStorageTest {
         String id = Util.getDigestOf("testIsReady");
         new Fingerprint(null, "foo.jar", Util.fromHexString(id));
         assertThat(fingerprintStorage.isReady(), is(true));
+    }
+
+    public static final class TestFacet extends FingerprintFacet {
+        final String property;
+
+        public TestFacet(Fingerprint fingerprint, long timestamp, String property) {
+            super(fingerprint, timestamp);
+            this.property = property;
+        }
+
+        @Override public String toString() {
+            return "TestFacet[" + property + "@" + getTimestamp() + "]";
+        }
     }
 
 }

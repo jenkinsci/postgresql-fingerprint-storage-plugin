@@ -132,6 +132,9 @@ public class JSONHandler {
 
         while (resultSet.next()) {
             String facetJSONString = resultSet.getString("facet");
+            if (facetJSONString.equals("")) {
+                break;
+            }
             JSONObject facet = new JSONObject(facetJSONString);
             facets.put(facet);
         }
@@ -142,10 +145,12 @@ public class JSONHandler {
     static @NonNull List<String> extractFacets(@NonNull Fingerprint fingerprint) throws SQLException {
         List<String> facetsString = new ArrayList<>();
 
-        JSONArray facets = (JSONArray) new JSONObject(XStreamHandler.getXStream().toXML(fingerprint)).get("facets");
+        JSONObject fingerprintJSON = new JSONObject(XStreamHandler.getXStream().toXML(fingerprint))
+                .getJSONObject("fingerprint");
 
-        for (Object facet : facets) {
-            facet = (JSONObject) facet;
+        JSONArray facetsJSON = fingerprintJSON.getJSONArray("facets");
+
+        for (Object facet : facetsJSON) {
             facetsString.add(facet.toString());
         }
 

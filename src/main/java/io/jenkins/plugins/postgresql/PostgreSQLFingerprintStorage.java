@@ -133,7 +133,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
 
                         boolean isOriginal = false;
 
-                        if (fingerprint.getOriginal().getName().equals(jobName)
+                        if (fingerprint.getOriginal()!=null && fingerprint.getOriginal().getName().equals(jobName)
                                 && fingerprint.getOriginal().getRun().number==build) {
                             isOriginal = true;
                         }
