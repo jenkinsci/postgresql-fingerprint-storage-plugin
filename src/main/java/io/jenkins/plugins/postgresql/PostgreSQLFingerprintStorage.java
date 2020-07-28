@@ -50,11 +50,9 @@ import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import jenkins.fingerprints.FingerprintStorageDescriptor;
 import org.json.JSONArray;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 
-import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 

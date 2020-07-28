@@ -29,6 +29,7 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
 import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.Util;
 import hudson.model.Fingerprint;
+import hudson.model.Run;
 import jenkins.fingerprints.FingerprintStorage;
 import jenkins.fingerprints.GlobalFingerprintConfiguration;
 import jenkins.model.FingerprintFacet;
@@ -113,6 +114,24 @@ public class PostgreSQLFingerprintStorageTest {
     }
 
     @Test
+    public void roundTripWithFacets() throws IOException {
+        setConfiguration();
+        PostgreSQLSchemaManager.performSchemaInitialization();
+        String id = Util.getDigestOf("roundTrip");
+
+        Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+        fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 3, "a"));
+        fingerprintSaved.getPersistedFacets().add(new TestFacetNew(fingerprintSaved, 33, "b"));
+        fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 333, "c"));
+
+        System.out.println(XStreamHandler.getXStream().toXML(fingerprintSaved));
+
+        Fingerprint fingerprintLoaded = Fingerprint.load(id);
+        assertThat(fingerprintLoaded, is(not(nullValue())));
+        assertThat(fingerprintSaved.toString(), is(equalTo(fingerprintLoaded.toString())));
+    }
+
+    @Test
     public void loadingNonExistentFingerprintShouldReturnNull() throws IOException{
         setConfiguration();
         String id = Util.getDigestOf("loadingNonExistentFingerprintShouldReturnNull");
@@ -152,6 +171,19 @@ public class PostgreSQLFingerprintStorageTest {
         final String property;
 
         public TestFacet(Fingerprint fingerprint, long timestamp, String property) {
+            super(fingerprint, timestamp);
+            this.property = property;
+        }
+
+        @Override public String toString() {
+            return "TestFacet[" + property + "@" + getTimestamp() + "]";
+        }
+    }
+
+    public static final class TestFacetNew extends FingerprintFacet {
+        final String property;
+
+        public TestFacetNew(Fingerprint fingerprint, long timestamp, String property) {
             super(fingerprint, timestamp);
             this.property = property;
         }
