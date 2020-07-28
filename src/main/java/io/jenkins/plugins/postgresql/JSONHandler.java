@@ -26,8 +26,8 @@ package io.jenkins.plugins.postgresql;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Fingerprint;
 import jdk.nashorn.internal.parser.JSONParser;
-import net.sf.json.JSONArray;
-import net.sf.json.JSONObject;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -60,10 +60,10 @@ public class JSONHandler {
         JSONArray md5sum = new JSONArray();
         JSONArray usages = new JSONArray();
 
-        md5sum.add(fingerprintMetadata.get("id"));
+        md5sum.put(fingerprintMetadata.get("id"));
 
-        if (facets.size() == 0) {
-            facets.add("");
+        if (facets.length() == 0) {
+            facets.put("");
         }
 
         if (usageMetadata.size() != 0) {
@@ -76,20 +76,17 @@ public class JSONHandler {
 
                 entry.put("entry", jobAndBuild);
 
-                usages.add(entry);
+                usages.put(entry);
             }
         } else {
-            usages.add("");
+            usages.put("");
         }
-
-
 
         fingerprint.put("timestamp", fingerprintMetadata.get("timestamp"));
         fingerprint.put("fileName", fingerprintMetadata.get("filename"));
         fingerprint.put("md5sum", md5sum);
         fingerprint.put("facets", facets);
         fingerprint.put("usages", usages);
-        fingerprint.put("original", null);
 
         json.put("fingerprint", fingerprint);
 
@@ -137,13 +134,8 @@ public class JSONHandler {
 
         while (resultSet.next()) {
             String facetJSONString = resultSet.getString("facet");
-
-            JSONParser parser = new JSONParser();
-            JSONObject json = (JSONObject) parser.parse(facetJSONString);
-
-            facets.add(new JSONObject(facetJSONString));
-            new JSONObject(facetJSONString);
-
+            JSONObject facet = new JSONObject(facetJSONString);
+            facets.put(facet);
         }
 
         return facets;

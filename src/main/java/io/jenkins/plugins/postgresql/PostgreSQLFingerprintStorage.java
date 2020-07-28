@@ -25,16 +25,12 @@ package io.jenkins.plugins.postgresql;
 
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import com.thoughtworks.xstream.converters.basic.DateConverter;
-import com.thoughtworks.xstream.converters.collections.CollectionConverter;
-import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.model.TaskListener;
-import hudson.util.HexBinaryConverter;
-import hudson.util.XStream2;
 import jenkins.fingerprints.FingerprintStorage;
 import hudson.model.Fingerprint;
 import hudson.Util;
@@ -47,12 +43,14 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Hashtable;
+import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jenkins.fingerprints.FingerprintStorageDescriptor;
-import net.sf.json.JSONArray;
+import org.json.JSONArray;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 
 import org.kohsuke.stapler.DataBoundConstructor;

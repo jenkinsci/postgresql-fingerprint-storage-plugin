@@ -121,6 +121,11 @@ THE SOFTWARE.
             <artifactId>jettison</artifactId>
             <version>1.4.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20200518</version>
+        </dependency>
     </dependencies>
 
     <url>https://github.com/jenkinsci/postgresql-fingerprint-storage-plugin</url>
