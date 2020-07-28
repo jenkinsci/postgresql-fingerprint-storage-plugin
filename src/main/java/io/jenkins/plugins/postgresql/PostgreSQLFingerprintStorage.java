@@ -130,7 +130,15 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                         preparedStatement.setString(2, instanceId);
                         preparedStatement.setString(3, jobName);
                         preparedStatement.setInt(4, build);
-                        preparedStatement.setBoolean(5, false);
+
+                        boolean isOriginal = false;
+
+                        if (fingerprint.getOriginal().getName().equals(jobName)
+                                && fingerprint.getOriginal().getRun().number==build) {
+                            isOriginal = true;
+                        }
+
+                        preparedStatement.setBoolean(5, isOriginal);
 
                         preparedStatement.execute();
                         preparedStatement.close();
