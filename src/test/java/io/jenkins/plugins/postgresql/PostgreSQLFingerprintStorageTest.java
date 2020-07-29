@@ -39,6 +39,9 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -79,6 +82,13 @@ public class PostgreSQLFingerprintStorageTest {
         setConfiguration();
         Object fingerprintStorage = FingerprintStorage.get();
         assertThat(fingerprintStorage, instanceOf(PostgreSQLFingerprintStorage.class));
+    }
+
+    @Test
+    public void testSave() throws IOException {
+        setConfiguration();
+        String id = Util.getDigestOf("testSave");
+        new Fingerprint(null, "foo.jar", Util.fromHexString(id));
     }
 
     @Test
