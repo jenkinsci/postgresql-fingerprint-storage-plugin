@@ -121,8 +121,8 @@ public class PostgreSQLFingerprintStorageTest {
 
         Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
         fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 3, "a"));
-        fingerprintSaved.getPersistedFacets().add(new TestFacetNew(fingerprintSaved, 33, "b"));
-        fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 333, "c"));
+        fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 33, "b"));
+        fingerprintSaved.getPersistedFacets().add(new TestFacetNew(fingerprintSaved, 333, "c"));
 
         System.out.println(XStreamHandler.getXStream().toXML(fingerprintSaved));
 

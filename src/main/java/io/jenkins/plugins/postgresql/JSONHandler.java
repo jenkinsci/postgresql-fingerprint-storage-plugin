@@ -144,37 +144,43 @@ public class JSONHandler {
     }
 
     static @NonNull Map<String, List<String>> extractFacets(@NonNull Fingerprint fingerprint) throws SQLException {
-        Map<String, List<String>> facets = new HashMap<>();
+        Map<String, List<String>> facetsMap = new HashMap<>();
 
         JSONObject fingerprintJSON = new JSONObject(XStreamHandler.getXStream().toXML(fingerprint))
                 .getJSONObject("fingerprint");
 
         JSONArray facetsJSON = fingerprintJSON.getJSONArray("facets");
 
-        System.out.println(facetsJSON.get(0));
-
         if (facetsJSON.get(0).equals("")) {
             return Collections.emptyMap();
         }
 
-        for (Object facetObject : facetsJSON.toList()) {
-            JSONObject facet = (JSONObject) facetObject;
+        for (int i = 0; i < facetsJSON.length(); i++) {
+            JSONObject facet = facetsJSON.getJSONObject(i);
 
             for (String facetName : facet.keySet()) {
-                JSONArray facetEntries = facet.getJSONArray(facetName);
                 List<String> facetEntriesList = new ArrayList<>();
+                Object facetEntryObject = facet.get(facetName);
 
-                for (Object facetEntryObject : facetEntries) {
+                if (facetEntryObject instanceof JSONObject) {
                     JSONObject facetEntry = (JSONObject) facetEntryObject;
                     facetEntriesList.add(facetEntry.toString());
+                } else if (facetEntryObject instanceof JSONArray) {
+                    JSONArray facetEntries = (JSONArray) facetEntryObject;
+
+                    for (int j = 0; j < facetEntries.length(); j++) {
+                        JSONObject facetEntry = facetEntries.getJSONObject(j);
+                        facetEntriesList.add(facetEntry.toString());
+                    }
+                } else {
+                    throw new SQLException("Unrecognized JSON Structure.");
                 }
 
-                facets.put(facetName, Collections.unmodifiableList(facetEntriesList));
+                facetsMap.put(facetName, Collections.unmodifiableList(facetEntriesList));
             }
-
         }
 
-        return Collections.unmodifiableMap(facets);
+        return Collections.unmodifiableMap(facetsMap);
     }
 
 }
