@@ -229,6 +229,12 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             preparedStatement.execute();
             preparedStatement.close();
 
+            preparedStatement = connection.prepareStatement(Queries.getQuery("delete_fingerprint_facet_relation"));
+            preparedStatement.setString(1, id);
+            preparedStatement.setString(2, instanceId);
+            preparedStatement.execute();
+            preparedStatement.close();
+
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();

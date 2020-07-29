@@ -89,6 +89,9 @@ public class JSONHandler {
 
         json.put("fingerprint", fingerprint);
 
+        System.out.println("We loaded:");
+        System.out.println(json.toString());
+
         return json.toString();
     }
 
@@ -129,18 +132,26 @@ public class JSONHandler {
     }
 
     static @NonNull JSONArray extractFacets(@NonNull ResultSet resultSet) throws SQLException {
-        JSONArray facets = new JSONArray();
+        JSONArray facetsArray = new JSONArray();
+        JSONObject facetsObject = new JSONObject();
 
         while (resultSet.next()) {
-            String facetJSONString = resultSet.getString("facet");
-            if (facetJSONString.equals("")) {
+            String facetName = resultSet.getString("facet_name");
+            if (facetName.equals("")) {
                 break;
             }
-            JSONObject facet = new JSONObject(facetJSONString);
-            facets.put(facet);
+
+            if (facetsObject.has(facetName)) {
+                facetsObject.getJSONArray(facetName).put(new JSONObject(resultSet.getString("facet_entry")));
+            } else {
+                JSONArray facetEntries = new JSONArray();
+                facetEntries.put(new JSONObject(resultSet.getString("facet_entry")));
+                facetsObject.put(facetName, facetEntries);
+            }
         }
 
-        return facets;
+        facetsArray.put(facetsObject);
+        return facetsArray;
     }
 
     static @NonNull Map<String, List<String>> extractFacets(@NonNull Fingerprint fingerprint) throws SQLException {
