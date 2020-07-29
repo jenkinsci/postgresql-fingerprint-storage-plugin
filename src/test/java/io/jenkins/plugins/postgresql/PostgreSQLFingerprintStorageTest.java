@@ -140,11 +140,6 @@ public class PostgreSQLFingerprintStorageTest {
         assertThat(fingerprint, is(nullValue()));
     }
 
-    @Test(expected=IOException.class)
-    public void shouldFailWhenStoredObjectIsInvalidFingerprint() throws IOException {
-        setConfiguration();
-    }
-
     @Test
     public void shouldDeleteFingerprint() throws IOException {
         setConfiguration();
@@ -172,19 +167,6 @@ public class PostgreSQLFingerprintStorageTest {
         final String property;
 
         public TestFacet(Fingerprint fingerprint, long timestamp, String property) {
-            super(fingerprint, timestamp);
-            this.property = property;
-        }
-
-        @Override public String toString() {
-            return "TestFacet[" + property + "@" + getTimestamp() + "]";
-        }
-    }
-
-    public static final class TestFacetNew extends FingerprintFacet {
-        final String property;
-
-        public TestFacetNew(Fingerprint fingerprint, long timestamp, String property) {
             super(fingerprint, timestamp);
             this.property = property;
         }
