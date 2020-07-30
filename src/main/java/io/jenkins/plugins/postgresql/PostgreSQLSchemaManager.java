@@ -34,6 +34,11 @@ public class PostgreSQLSchemaManager {
             connection.setAutoCommit(false);
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_schema"))) {
+                preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("create_fingerprint_table"))) {
                 preparedStatement.execute();
             }
