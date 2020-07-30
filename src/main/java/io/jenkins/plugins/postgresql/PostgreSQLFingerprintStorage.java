@@ -38,10 +38,12 @@ import hudson.Util;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
 
+import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -92,6 +94,15 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 preparedStatement.setString(2, instanceId);
                 preparedStatement.setString(3, DATE_CONVERTER.toString(fingerprint.getTimestamp()));
                 preparedStatement.setString(4, fingerprint.getFileName());
+
+                if (fingerprint.getOriginal() != null) {
+                    preparedStatement.setString(5, fingerprint.getOriginal().getName());
+                    preparedStatement.setInt(6, fingerprint.getOriginal().getRun().number);
+                } else {
+                    preparedStatement.setNull(5, Types.NULL);
+                    preparedStatement.setNull(6, Types.NULL);
+                }
+
                 preparedStatement.executeUpdate();
             }
 
@@ -108,13 +119,6 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                             preparedStatement.setString(2, instanceId);
                             preparedStatement.setString(3, jobName);
                             preparedStatement.setInt(4, build);
-
-                            boolean isOriginal = false;
-                            if (fingerprint.getOriginal() != null && fingerprint.getOriginal().getName().equals(jobName)
-                                    && fingerprint.getOriginal().getRun().number==build) {
-                                isOriginal = true;
-                            }
-                            preparedStatement.setBoolean(5, isOriginal);
 
                             preparedStatement.executeUpdate();
                         }

@@ -59,6 +59,13 @@ public class DataConversionHandler {
         JSONObject fingerprint = new JSONObject();
         JSONArray md5sum = new JSONArray();
         JSONArray usages = new JSONArray();
+        JSONObject original = null;
+
+        if (fingerprintMetadata.get("original_job_build") != null) {
+            original = new JSONObject();
+            original.put("name", fingerprintMetadata.get("original_job_name"));
+            original.put("number", Integer.parseInt(fingerprintMetadata.get("original_job_build")));
+        }
 
         md5sum.put(fingerprintMetadata.get("id"));
 
@@ -89,6 +96,7 @@ public class DataConversionHandler {
         fingerprint.put("md5sum", md5sum);
         fingerprint.put("facets", facets);
         fingerprint.put("usages", usages);
+        fingerprint.put("original", original);
 
         json.put("fingerprint", fingerprint);
 
@@ -96,6 +104,26 @@ public class DataConversionHandler {
         System.out.println(json.toString());
 
         return json.toString();
+    }
+
+    static @NonNull Map<String,String> extractFingerprintMetadata(@NonNull ResultSet resultSet, @NonNull String id)
+            throws SQLException {
+        Map<String, String> fingerprintMetadata = new HashMap<>();
+
+        if (resultSet.next()) {
+            String timestamp = resultSet.getString("timestamp");
+            String filename = resultSet.getString("filename");
+            String originalJobName = resultSet.getString("original_job_name");
+            String originalJobBuild = resultSet.getString("original_job_build");
+
+            fingerprintMetadata.put("timestamp", timestamp);
+            fingerprintMetadata.put("filename", filename);
+            fingerprintMetadata.put("id", id);
+            fingerprintMetadata.put("original_job_name", originalJobName);
+            fingerprintMetadata.put("original_job_build", originalJobBuild);
+        }
+
+        return Collections.unmodifiableMap(fingerprintMetadata);
     }
 
     static @NonNull Map<String, Fingerprint.RangeSet> extractUsageMetadata(@NonNull ResultSet resultSet)
@@ -116,22 +144,6 @@ public class DataConversionHandler {
         }
 
         return Collections.unmodifiableMap(usageMetadata);
-    }
-
-    static @NonNull Map<String,String> extractFingerprintMetadata(@NonNull ResultSet resultSet, @NonNull String id)
-            throws SQLException {
-        Map<String, String> fingerprintMetadata = new HashMap<>();
-
-        if (resultSet.next()) {
-            String timestamp = resultSet.getString("timestamp");
-            String filename = resultSet.getString("filename");
-
-            fingerprintMetadata.put("timestamp", timestamp);
-            fingerprintMetadata.put("filename", filename);
-            fingerprintMetadata.put("id", id);
-        }
-
-        return Collections.unmodifiableMap(fingerprintMetadata);
     }
 
     static @NonNull JSONArray extractFacets(@NonNull ResultSet resultSet) throws SQLException {
