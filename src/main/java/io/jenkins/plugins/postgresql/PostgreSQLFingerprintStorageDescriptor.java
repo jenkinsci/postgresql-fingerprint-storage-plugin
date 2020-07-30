@@ -136,7 +136,7 @@ public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDe
 
     protected void testConnection (String host, int port, String databaseName, String credentialsId, boolean ssl,
                                    int connectionTimeout, int socketTimeout) throws SQLException {
-        PostgreSQLFingerprintStorage.getConnection(host, port, databaseName, credentialsId, ssl, connectionTimeout,
+        PostgreSQLConnection.getConnection(host, port, databaseName, credentialsId, ssl, connectionTimeout,
                 socketTimeout);
     }
 

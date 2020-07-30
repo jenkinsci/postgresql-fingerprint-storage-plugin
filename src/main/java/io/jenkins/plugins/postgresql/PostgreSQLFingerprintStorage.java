@@ -81,7 +81,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     /**
      * Saves the given fingerprint.
      */
-    public synchronized void save(Fingerprint fingerprint) {
+    public synchronized void save(@NonNull Fingerprint fingerprint) {
         delete(fingerprint.getHashString());
         try (Connection connection = getConnection()) {
             connection.setAutoCommit(false);
@@ -111,7 +111,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
 
                         boolean isOriginal = false;
 
-                        if (fingerprint.getOriginal()!=null && fingerprint.getOriginal().getName().equals(jobName)
+                        if (fingerprint.getOriginal() != null && fingerprint.getOriginal().getName().equals(jobName)
                                 && fingerprint.getOriginal().getRun().number==build) {
                             isOriginal = true;
                         }

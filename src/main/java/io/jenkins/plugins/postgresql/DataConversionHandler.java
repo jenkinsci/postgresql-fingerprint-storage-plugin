@@ -34,6 +34,9 @@ import java.util.*;
 
 public class DataConversionHandler {
 
+    /**
+     * TODO: THIS METHOD HAS PRIVATE SCOPE IN JENKINS CORE. SHOULD BE EXPOSED FROM THERE.
+     */
     private static String serialize(Fingerprint.RangeSet src) {
         StringBuilder buf = new StringBuilder(src.getRanges().size() * 10);
         for (Fingerprint.Range r : src.getRanges()) {
