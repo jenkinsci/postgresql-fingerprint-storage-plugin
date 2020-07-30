@@ -32,7 +32,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 
-public class JSONHandler {
+public class DataConversionHandler {
 
     private static String serialize(Fingerprint.RangeSet src) {
         StringBuilder buf = new StringBuilder(src.getRanges().size() * 10);

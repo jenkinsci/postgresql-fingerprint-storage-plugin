@@ -39,14 +39,12 @@ import java.io.IOException;
 import java.io.ByteArrayInputStream;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -76,26 +74,8 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     }
 
     public Connection getConnection() throws SQLException {
-        return getConnection(getHost(), getPort(), getDatabaseName(), getCredentialsId(), getSsl(),
+        return PostgreSQLConnection.getConnection(getHost(), getPort(), getDatabaseName(), getCredentialsId(), getSsl(),
                 getConnectionTimeout(), getSocketTimeout());
-    }
-
-    public static Connection getConnection(String host, int port, String databaseName, String credentialsId,
-                                           boolean ssl, int connectionTimeout, int socketTimeout) throws SQLException {
-        String url = "jdbc:postgresql://" + host + ":" + port + "/" + databaseName;
-
-        Properties properties = new Properties();
-        StandardUsernamePasswordCredentials standardUsernamePasswordCredentials =
-                CredentialHelper.getCredential(credentialsId);
-        properties.setProperty("user", CredentialHelper.getUsernameFromCredential(standardUsernamePasswordCredentials));
-        properties.setProperty("password", CredentialHelper.getPasswordFromCredential(standardUsernamePasswordCredentials));
-        if (ssl) {
-            properties.setProperty("ssl", Boolean.toString(true));
-        }
-        properties.setProperty("connectTimeout", Integer.toString(connectionTimeout));
-        properties.setProperty("socketTimeout", Integer.toString(socketTimeout));
-
-        return DriverManager.getConnection(url, properties);
     }
 
     /**
@@ -144,7 +124,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 }
             }
 
-            Map<String, List<String>> facets = JSONHandler.extractFacets(fingerprint);
+            Map<String, List<String>> facets = DataConversionHandler.extractFacets(fingerprint);
             for (Map.Entry<String, List<String>> entry : facets.entrySet()) {
                 String facetName = entry.getKey();
                 List<String> facetEntries = entry.getValue();
@@ -180,7 +160,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             preparedStatement.setString(1, id);
             preparedStatement.setString(2, instanceId);
             ResultSet resultSet = preparedStatement.executeQuery();
-            Map<String,String> fingerprintMetadata = JSONHandler.extractFingerprintMetadata(resultSet, id);
+            Map<String,String> fingerprintMetadata = DataConversionHandler.extractFingerprintMetadata(resultSet, id);
             preparedStatement.close();
 
             if (fingerprintMetadata.size() == 0) {
@@ -191,17 +171,17 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             preparedStatement.setString(1, id);
             preparedStatement.setString(2, instanceId);
             resultSet = preparedStatement.executeQuery();
-            Map<String, Fingerprint.RangeSet> usageMetadata = JSONHandler.extractUsageMetadata(resultSet);
+            Map<String, Fingerprint.RangeSet> usageMetadata = DataConversionHandler.extractUsageMetadata(resultSet);
             preparedStatement.close();
 
             preparedStatement = connection.prepareStatement(Queries.getQuery("select_fingerprint_facet_relation"));
             preparedStatement.setString(1, id);
             preparedStatement.setString(2, instanceId);
             resultSet = preparedStatement.executeQuery();
-            JSONArray facets = JSONHandler.extractFacets(resultSet);
+            JSONArray facets = DataConversionHandler.extractFacets(resultSet);
             preparedStatement.close();
 
-            String json = JSONHandler.constructFingerprintJSON(fingerprintMetadata, usageMetadata, facets);
+            String json = DataConversionHandler.constructFingerprintJSON(fingerprintMetadata, usageMetadata, facets);
 
             fingerprint = (Fingerprint) XStreamHandler.getXStream().fromXML(json);
         } catch (SQLException e) {
