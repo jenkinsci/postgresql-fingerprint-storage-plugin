@@ -23,18 +23,11 @@
  */
 package io.jenkins.plugins.postgresql;
 
-import com.cloudbees.plugins.credentials.CredentialsScope;
-import com.cloudbees.plugins.credentials.SystemCredentialsProvider;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
-import com.cloudbees.plugins.credentials.impl.UsernamePasswordCredentialsImpl;
 import hudson.Util;
 import hudson.model.Fingerprint;
-import hudson.model.Run;
 import jenkins.fingerprints.FingerprintStorage;
-import jenkins.fingerprints.GlobalFingerprintConfiguration;
 import jenkins.model.FingerprintFacet;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -47,7 +40,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
