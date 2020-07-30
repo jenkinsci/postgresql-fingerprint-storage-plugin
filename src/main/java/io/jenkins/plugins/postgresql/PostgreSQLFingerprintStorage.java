@@ -86,13 +86,14 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
         try (Connection connection = getConnection()) {
             connection.setAutoCommit(false);
 
-            PreparedStatement preparedStatement = connection.prepareStatement(Queries.getQuery("insert_fingerprint"));
-            preparedStatement.setString(1, fingerprint.getHashString());
-            preparedStatement.setString(2, instanceId);
-            preparedStatement.setString(3, DATE_CONVERTER.toString(fingerprint.getTimestamp()));
-            preparedStatement.setString(4, fingerprint.getFileName());
-            preparedStatement.execute();
-            preparedStatement.close();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("insert_fingerprint"))) {
+                preparedStatement.setString(1, fingerprint.getHashString());
+                preparedStatement.setString(2, instanceId);
+                preparedStatement.setString(3, DATE_CONVERTER.toString(fingerprint.getTimestamp()));
+                preparedStatement.setString(4, fingerprint.getFileName());
+                preparedStatement.execute();
+            }
 
             Hashtable<String, Fingerprint.RangeSet> usages = fingerprint.getUsages();
             if (usages != null) {
@@ -101,25 +102,22 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                     Fingerprint.RangeSet rangeSet = usage.getValue();
 
                     for (int build : rangeSet.listNumbers()) {
-                        preparedStatement = connection.prepareStatement(
-                                Queries.getQuery("insert_fingerprint_job_build_relation"));
+                        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                                Queries.getQuery("insert_fingerprint_job_build_relation"))) {
+                            preparedStatement.setString(1, fingerprint.getHashString());
+                            preparedStatement.setString(2, instanceId);
+                            preparedStatement.setString(3, jobName);
+                            preparedStatement.setInt(4, build);
 
-                        preparedStatement.setString(1, fingerprint.getHashString());
-                        preparedStatement.setString(2, instanceId);
-                        preparedStatement.setString(3, jobName);
-                        preparedStatement.setInt(4, build);
+                            boolean isOriginal = false;
+                            if (fingerprint.getOriginal() != null && fingerprint.getOriginal().getName().equals(jobName)
+                                    && fingerprint.getOriginal().getRun().number==build) {
+                                isOriginal = true;
+                            }
+                            preparedStatement.setBoolean(5, isOriginal);
 
-                        boolean isOriginal = false;
-
-                        if (fingerprint.getOriginal() != null && fingerprint.getOriginal().getName().equals(jobName)
-                                && fingerprint.getOriginal().getRun().number==build) {
-                            isOriginal = true;
+                            preparedStatement.execute();
                         }
-
-                        preparedStatement.setBoolean(5, isOriginal);
-
-                        preparedStatement.execute();
-                        preparedStatement.close();
                     }
                 }
             }
@@ -130,20 +128,17 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 List<String> facetEntries = entry.getValue();
 
                 for (String facetEntry : facetEntries) {
-                    preparedStatement = connection.prepareStatement(
-                            Queries.getQuery("insert_fingerprint_facet_relation"));
+                    try (PreparedStatement preparedStatement = connection.prepareStatement(
+                            Queries.getQuery("insert_fingerprint_facet_relation"))) {
+                        preparedStatement.setString(1, fingerprint.getHashString());
+                        preparedStatement.setString(2, instanceId);
+                        preparedStatement.setString(3, facetName);
+                        preparedStatement.setString(4, facetEntry);
 
-                    preparedStatement.setString(1, fingerprint.getHashString());
-                    preparedStatement.setString(2, instanceId);
-                    preparedStatement.setString(3, facetName);
-                    preparedStatement.setString(4, facetEntry);
-
-                    preparedStatement.execute();
-                    preparedStatement.close();
+                        preparedStatement.execute();
+                    }
                 }
-
             }
-
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -156,30 +151,39 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     public @CheckForNull Fingerprint load(@NonNull String id) {
         Fingerprint fingerprint = null;
         try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(Queries.getQuery("select_fingerprint"));
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, instanceId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            Map<String,String> fingerprintMetadata = DataConversionHandler.extractFingerprintMetadata(resultSet, id);
-            preparedStatement.close();
+            Map<String,String> fingerprintMetadata;
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("select_fingerprint"))) {
+                preparedStatement.setString(1, id);
+                preparedStatement.setString(2, instanceId);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                fingerprintMetadata = DataConversionHandler.extractFingerprintMetadata(resultSet, id);
+            }
 
             if (fingerprintMetadata.size() == 0) {
                 return null;
             }
 
-            preparedStatement = connection.prepareStatement(Queries.getQuery("select_fingerprint_job_build_relation"));
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, instanceId);
-            resultSet = preparedStatement.executeQuery();
-            Map<String, Fingerprint.RangeSet> usageMetadata = DataConversionHandler.extractUsageMetadata(resultSet);
-            preparedStatement.close();
+            Map<String, Fingerprint.RangeSet> usageMetadata;
 
-            preparedStatement = connection.prepareStatement(Queries.getQuery("select_fingerprint_facet_relation"));
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, instanceId);
-            resultSet = preparedStatement.executeQuery();
-            JSONArray facets = DataConversionHandler.extractFacets(resultSet);
-            preparedStatement.close();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("select_fingerprint_job_build_relation"))) {
+                preparedStatement.setString(1, id);
+                preparedStatement.setString(2, instanceId);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                usageMetadata = DataConversionHandler.extractUsageMetadata(resultSet);
+            }
+
+            JSONArray facets;
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("select_fingerprint_facet_relation"))) {
+                preparedStatement.setString(1, id);
+                preparedStatement.setString(2, instanceId);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                facets = DataConversionHandler.extractFacets(resultSet);
+            }
 
             String json = DataConversionHandler.constructFingerprintJSON(fingerprintMetadata, usageMetadata, facets);
 
@@ -197,23 +201,26 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
         try (Connection connection = getConnection()) {
             connection.setAutoCommit(false);
 
-            PreparedStatement preparedStatement = connection.prepareStatement(Queries.getQuery("delete_fingerprint"));
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, instanceId);
-            preparedStatement.execute();
-            preparedStatement.close();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("delete_fingerprint"))) {
+                preparedStatement.setString(1, id);
+                preparedStatement.setString(2, instanceId);
+                preparedStatement.execute();
+            }
 
-            preparedStatement = connection.prepareStatement(Queries.getQuery("delete_fingerprint_job_build_relation"));
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, instanceId);
-            preparedStatement.execute();
-            preparedStatement.close();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("delete_fingerprint_job_build_relation"))) {
+                preparedStatement.setString(1, id);
+                preparedStatement.setString(2, instanceId);
+                preparedStatement.execute();
+            }
 
-            preparedStatement = connection.prepareStatement(Queries.getQuery("delete_fingerprint_facet_relation"));
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, instanceId);
-            preparedStatement.execute();
-            preparedStatement.close();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("delete_fingerprint_facet_relation"))) {
+                preparedStatement.setString(1, id);
+                preparedStatement.setString(2, instanceId);
+                preparedStatement.execute();
+            }
 
             connection.commit();
         } catch (SQLException e) {
@@ -228,10 +235,10 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
         boolean isReady = false;
 
         try (Connection connection = getConnection()) {
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("select_fingerprint_exists_for_instance"));
-            isReady = preparedStatement.execute();
-            preparedStatement.close();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("select_fingerprint_exists_for_instance"))) {
+                isReady = preparedStatement.execute();
+            }
             return isReady;
         } catch (SQLException e) {
             e.printStackTrace();
