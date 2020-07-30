@@ -92,7 +92,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 preparedStatement.setString(2, instanceId);
                 preparedStatement.setString(3, DATE_CONVERTER.toString(fingerprint.getTimestamp()));
                 preparedStatement.setString(4, fingerprint.getFileName());
-                preparedStatement.execute();
+                preparedStatement.executeUpdate();
             }
 
             Hashtable<String, Fingerprint.RangeSet> usages = fingerprint.getUsages();
@@ -116,7 +116,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                             }
                             preparedStatement.setBoolean(5, isOriginal);
 
-                            preparedStatement.execute();
+                            preparedStatement.executeUpdate();
                         }
                     }
                 }
@@ -135,7 +135,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                         preparedStatement.setString(3, facetName);
                         preparedStatement.setString(4, facetEntry);
 
-                        preparedStatement.execute();
+                        preparedStatement.executeUpdate();
                     }
                 }
             }
@@ -205,21 +205,21 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                     Queries.getQuery("delete_fingerprint"))) {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
-                preparedStatement.execute();
+                preparedStatement.executeUpdate();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("delete_fingerprint_job_build_relation"))) {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
-                preparedStatement.execute();
+                preparedStatement.executeUpdate();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("delete_fingerprint_facet_relation"))) {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
-                preparedStatement.execute();
+                preparedStatement.executeUpdate();
             }
 
             connection.commit();

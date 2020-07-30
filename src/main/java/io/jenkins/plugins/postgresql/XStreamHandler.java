@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class XStreamHandler {
 
-    private static XStream2 XSTREAM = new XStream2(new JettisonMappedXmlDriver());
+    private static XStream2 XSTREAM;
 
     @NonNull
     static XStream2 getXStream() {

@@ -122,7 +122,7 @@ public class DataConversionHandler {
             throws SQLException {
         Map<String, String> fingerprintMetadata = new HashMap<>();
 
-        while (resultSet.next()) {
+        if (resultSet.next()) {
             String timestamp = resultSet.getString("timestamp");
             String filename = resultSet.getString("filename");
 

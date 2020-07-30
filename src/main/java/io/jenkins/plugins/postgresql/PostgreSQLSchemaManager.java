@@ -25,6 +25,7 @@ package io.jenkins.plugins.postgresql;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class PostgreSQLSchemaManager {
@@ -32,6 +33,14 @@ public class PostgreSQLSchemaManager {
     public static void performSchemaInitialization() {
         try (Connection connection = PostgreSQLFingerprintStorage.get().getConnection()) {
             connection.setAutoCommit(false);
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("check_schema_exists"))) {
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next() && resultSet.getInt("total") == 1) {
+                    return;
+                }
+            }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("create_fingerprint_schema"))) {
