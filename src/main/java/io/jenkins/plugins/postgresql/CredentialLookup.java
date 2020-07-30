@@ -38,7 +38,7 @@ import java.util.List;
 /**
  * Helper class to support credential operations.
  */
-public class CredentialHelper {
+public class CredentialLookup {
 
     static @NonNull String getUsernameFromCredential(@CheckForNull StandardUsernamePasswordCredentials credential) {
         if (credential == null) {

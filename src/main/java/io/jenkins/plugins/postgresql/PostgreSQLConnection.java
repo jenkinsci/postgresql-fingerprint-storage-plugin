@@ -12,9 +12,9 @@ public class PostgreSQLConnection {
     public static Connection getConnection(String host, int port, String databaseName, String credentialsId,
                                            boolean ssl, int connectionTimeout, int socketTimeout) throws SQLException {
         StandardUsernamePasswordCredentials standardUsernamePasswordCredentials =
-                CredentialHelper.getCredential(credentialsId);
-        String username = CredentialHelper.getUsernameFromCredential(standardUsernamePasswordCredentials);
-        String password = CredentialHelper.getPasswordFromCredential(standardUsernamePasswordCredentials);
+                CredentialLookup.getCredential(credentialsId);
+        String username = CredentialLookup.getUsernameFromCredential(standardUsernamePasswordCredentials);
+        String password = CredentialLookup.getPasswordFromCredential(standardUsernamePasswordCredentials);
         return getConnection(host, port, databaseName, username, password, ssl, connectionTimeout, socketTimeout);
     }
 

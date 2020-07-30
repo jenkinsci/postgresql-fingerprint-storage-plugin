@@ -317,13 +317,13 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     }
 
     public @NonNull String getUsername() {
-        StandardUsernamePasswordCredentials credential = CredentialHelper.getCredential(getCredentialsId());
-        return CredentialHelper.getUsernameFromCredential(credential);
+        StandardUsernamePasswordCredentials credential = CredentialLookup.getCredential(getCredentialsId());
+        return CredentialLookup.getUsernameFromCredential(credential);
     }
 
     public @NonNull String getPassword() {
-        StandardUsernamePasswordCredentials credential = CredentialHelper.getCredential(getCredentialsId());
-        return CredentialHelper.getPasswordFromCredential(credential);
+        StandardUsernamePasswordCredentials credential = CredentialLookup.getCredential(getCredentialsId());
+        return CredentialLookup.getPasswordFromCredential(credential);
     }
 
     @Extension
