@@ -33,20 +33,20 @@ public class PostgreSQLSchemaManager {
         try (Connection connection = PostgreSQLFingerprintStorage.get().getConnection()) {
             connection.setAutoCommit(false);
 
-            PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_table"));
-            preparedStatement.execute();
-            preparedStatement.close();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_table"))) {
+                preparedStatement.execute();
+            }
 
-            preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_job_build_relation_table"));
-            preparedStatement.execute();
-            preparedStatement.close();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
+                preparedStatement.execute();
+            }
 
-            preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_facet_relation_table"));
-            preparedStatement.execute();
-            preparedStatement.close();
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_facet_relation_table"))) {
+                preparedStatement.execute();
+            }
 
             connection.commit();
         } catch (SQLException e) {
