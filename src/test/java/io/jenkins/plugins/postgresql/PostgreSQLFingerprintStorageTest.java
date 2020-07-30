@@ -33,14 +33,18 @@ import hudson.model.Run;
 import jenkins.fingerprints.FingerprintStorage;
 import jenkins.fingerprints.GlobalFingerprintConfiguration;
 import jenkins.model.FingerprintFacet;
+import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.testcontainers.containers.PostgreSQLContainer;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.hasItem;
@@ -60,21 +64,8 @@ public class PostgreSQLFingerprintStorageTest {
     public PostgreSQLContainer postgres = new PostgreSQLContainer();
 
     public void setConfiguration() throws IOException {
-        StandardUsernamePasswordCredentials standardUsernamePasswordCredentials = new UsernamePasswordCredentialsImpl(
-                CredentialsScope.SYSTEM,
-                "credentialId",
-                null,
-                postgres.getUsername(),
-                postgres.getPassword()
-        );
-        SystemCredentialsProvider.getInstance().getCredentials().add(standardUsernamePasswordCredentials);
-        SystemCredentialsProvider.getInstance().save();
-
-        PostgreSQLFingerprintStorage.get().setHost(postgres.getHost());
-        PostgreSQLFingerprintStorage.get().setPort(postgres.getFirstMappedPort());
-        PostgreSQLFingerprintStorage.get().setDatabaseName(postgres.getDatabaseName());
-        PostgreSQLFingerprintStorage.get().setCredentialsId(standardUsernamePasswordCredentials.getId());
-        GlobalFingerprintConfiguration.get().setStorage(PostgreSQLFingerprintStorage.get());
+        PostgreSQLConfiguration.setConfiguration(postgres.getUsername(), postgres.getPassword(), postgres.getHost(),
+                postgres.getFirstMappedPort(), postgres.getDatabaseName());
     }
 
     @Test
@@ -85,16 +76,58 @@ public class PostgreSQLFingerprintStorageTest {
     }
 
     @Test
-    public void testSave() throws IOException {
+    public void testSave() throws IOException, SQLException {
         setConfiguration();
+        String instanceId = Util.getDigestOf(new ByteArrayInputStream(InstanceIdentity.get().getPublic().getEncoded()));
         String id = Util.getDigestOf("testSave");
-        new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+        Fingerprint fingerprint = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+
+        try (Connection connection = PostgreSQLFingerprintStorage.get().getConnection()) {
+            PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("select_fingerprint_count"));
+            preparedStatement.setString(1, id);
+            preparedStatement.setString(2, instanceId);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int fingerprintCount = resultSet.getInt("total");
+                assertThat(fingerprintCount, is(1));
+            }
+            preparedStatement.close();
+
+            fingerprint.add("a", 3);
+            fingerprint.getPersistedFacets().add(new TestFacet(fingerprint, 3, "a"));
+
+            preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("select_fingerprint_count"));
+            preparedStatement.setString(1, id);
+            preparedStatement.setString(2, instanceId);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int fingerprintCount = resultSet.getInt("total");
+                assertThat(fingerprintCount, is(1));
+            }
+            preparedStatement.close();
+
+            preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("select_fingerprint_count"));
+            preparedStatement.setString(1, id);
+            preparedStatement.setString(2, instanceId);
+            resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int fingerprintCount = resultSet.getInt("total");
+                assertThat(fingerprintCount, is(1));
+            }
+            preparedStatement.close();
+
+
+        }
+
+
     }
 
     @Test
     public void roundTrip() throws IOException {
         setConfiguration();
-        PostgreSQLSchemaManager.performSchemaInitialization();
         String id = Util.getDigestOf("roundTrip");
 
         Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
@@ -108,7 +141,6 @@ public class PostgreSQLFingerprintStorageTest {
     @Test
     public void roundTripWithUsages() throws IOException {
         setConfiguration();
-        PostgreSQLSchemaManager.performSchemaInitialization();
         String id = Util.getDigestOf("roundTrip");
 
         Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
@@ -126,7 +158,6 @@ public class PostgreSQLFingerprintStorageTest {
     @Test
     public void roundTripWithFacets() throws IOException {
         setConfiguration();
-        PostgreSQLSchemaManager.performSchemaInitialization();
         String id = Util.getDigestOf("roundTrip");
 
         Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
