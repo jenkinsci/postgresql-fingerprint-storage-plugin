@@ -31,8 +31,11 @@ import org.json.JSONObject;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
+import java.util.logging.Logger;
 
 public class DataConversionHandler {
+
+    private static final Logger LOGGER = Logger.getLogger(DataConversionHandler.class.getName());
 
     /**
      * TODO: THIS METHOD HAS PRIVATE SCOPE IN JENKINS CORE. SHOULD BE EXPOSED FROM THERE.
@@ -100,9 +103,7 @@ public class DataConversionHandler {
 
         json.put("fingerprint", fingerprint);
 
-        System.out.println("We loaded:");
-        System.out.println(json.toString());
-
+        LOGGER.fine("Fingerprint loaded: " + json.toString());
         return json.toString();
     }
 

@@ -38,7 +38,6 @@ import hudson.Util;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
 
-import java.lang.reflect.Type;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
