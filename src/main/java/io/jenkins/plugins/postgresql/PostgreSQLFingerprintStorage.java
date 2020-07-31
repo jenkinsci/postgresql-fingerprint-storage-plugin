@@ -87,6 +87,8 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
         try (Connection connection = getConnection()) {
             connection.setAutoCommit(false);
 
+            delete(fingerprint.getHashString(), connection);
+
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("insert_fingerprint"))) {
                 preparedStatement.setString(1, fingerprint.getHashString());
@@ -203,31 +205,33 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     public void delete(@NonNull String id) {
         try (Connection connection = getConnection()) {
             connection.setAutoCommit(false);
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("delete_fingerprint"))) {
-                preparedStatement.setString(1, id);
-                preparedStatement.setString(2, instanceId);
-                preparedStatement.executeUpdate();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("delete_fingerprint_job_build_relation"))) {
-                preparedStatement.setString(1, id);
-                preparedStatement.setString(2, instanceId);
-                preparedStatement.executeUpdate();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("delete_fingerprint_facet_relation"))) {
-                preparedStatement.setString(1, id);
-                preparedStatement.setString(2, instanceId);
-                preparedStatement.executeUpdate();
-            }
-
+            delete(id, connection);
             connection.commit();
         } catch (SQLException e) {
             e.printStackTrace();
+        }
+    }
+
+    public void delete(@NonNull String id, @NonNull Connection connection) throws SQLException {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                Queries.getQuery("delete_fingerprint"))) {
+            preparedStatement.setString(1, id);
+            preparedStatement.setString(2, instanceId);
+            preparedStatement.executeUpdate();
+        }
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                Queries.getQuery("delete_fingerprint_job_build_relation"))) {
+            preparedStatement.setString(1, id);
+            preparedStatement.setString(2, instanceId);
+            preparedStatement.executeUpdate();
+        }
+
+        try (PreparedStatement preparedStatement = connection.prepareStatement(
+                Queries.getQuery("delete_fingerprint_facet_relation"))) {
+            preparedStatement.setString(1, id);
+            preparedStatement.setString(2, instanceId);
+            preparedStatement.executeUpdate();
         }
     }
 
