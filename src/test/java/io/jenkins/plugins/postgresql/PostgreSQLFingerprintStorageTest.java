@@ -80,7 +80,7 @@ public class PostgreSQLFingerprintStorageTest {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
                 ResultSet resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
+                if (resultSet.next()) {
                     int fingerprintCount = resultSet.getInt("total");
                     assertThat(fingerprintCount, is(1));
                 }
@@ -94,7 +94,7 @@ public class PostgreSQLFingerprintStorageTest {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
                 ResultSet resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
+                if (resultSet.next()) {
                     int fingerprintCount = resultSet.getInt("total");
                     assertThat(fingerprintCount, is(1));
                 }
@@ -105,7 +105,7 @@ public class PostgreSQLFingerprintStorageTest {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
                 ResultSet resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
+                if (resultSet.next()) {
                     int fingerprintCount = resultSet.getInt("total");
                     assertThat(fingerprintCount, is(1));
                 }

@@ -243,20 +243,20 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
      * Returns true if there's some data in the fingerprint database.
      */
     public boolean isReady() throws IOException {
-        boolean isReady = false;
-
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("select_fingerprint_exists_for_instance"))) {
-                isReady = preparedStatement.execute();
+                preparedStatement.setString(1, instanceId);
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    int fingerprintCount = resultSet.getInt("total");
+                    return (fingerprintCount > 0);
+                }
             }
-            return isReady;
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Failed connecting to PostgreSQL.", e);
             throw new IOException(e);
         }
-
-        return isReady;
     }
 
     @Override
