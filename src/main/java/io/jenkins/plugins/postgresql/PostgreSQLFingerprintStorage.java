@@ -82,7 +82,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     /**
      * Saves the given fingerprint.
      */
-    public synchronized void save(@NonNull Fingerprint fingerprint) {
+    public synchronized void save(@NonNull Fingerprint fingerprint) throws IOException {
         delete(fingerprint.getHashString());
         try (Connection connection = getConnection()) {
             connection.setAutoCommit(false);
@@ -146,14 +146,15 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             }
             connection.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "PostgreSQL failed in saving fingerprint: " + fingerprint.toString(), e);
+            throw new IOException(e);
         }
     }
 
     /**
      * Returns the fingerprint associated with the given unique id and the Jenkins instance ID, from the storage.
      */
-    public @CheckForNull Fingerprint load(@NonNull String id) {
+    public @CheckForNull Fingerprint load(@NonNull String id) throws IOException {
         Fingerprint fingerprint = null;
         try (Connection connection = getConnection()) {
             Map<String,String> fingerprintMetadata;
@@ -194,21 +195,24 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
 
             fingerprint = (Fingerprint) XStreamHandler.getXStream().fromXML(json);
         } catch (SQLException e) {
-            LOGGER.log(Level.WARNING, "Postgres failed in loading fingerprint: " + id, e);
+            LOGGER.log(Level.WARNING, "PostgreSQL failed in loading fingerprint: " + fingerprint.toString(), e);
+            throw new IOException(e);
         }
+
         return fingerprint;
     }
 
     /**
      * Deletes the fingerprint with the given id.
      */
-    public void delete(@NonNull String id) {
+    public void delete(@NonNull String id) throws IOException {
         try (Connection connection = getConnection()) {
             connection.setAutoCommit(false);
             delete(id, connection);
             connection.commit();
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "PostgreSQL failed in deleting fingerprint: " + id, e);
+            throw new IOException(e);
         }
     }
 
@@ -238,7 +242,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     /**
      * Returns true if there's some data in the fingerprint database.
      */
-    public boolean isReady() {
+    public boolean isReady() throws IOException {
         boolean isReady = false;
 
         try (Connection connection = getConnection()) {
@@ -248,7 +252,8 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             }
             return isReady;
         } catch (SQLException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Failed connecting to PostgreSQL.", e);
+            throw new IOException(e);
         }
 
         return isReady;
