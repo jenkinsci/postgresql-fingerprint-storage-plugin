@@ -42,10 +42,14 @@ public class PostgreSQLSchemaManager {
                 }
             }
 
+            // Create schema
+
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("create_fingerprint_schema"))) {
                 preparedStatement.execute();
             }
+
+            // Create fingerprint table
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("create_fingerprint_table"))) {
@@ -53,12 +57,31 @@ public class PostgreSQLSchemaManager {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_index"))) {
+                preparedStatement.execute();
+            }
+
+            // Create fingerprint job build relation table
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_job_build_relation_index"))) {
+                preparedStatement.execute();
+            }
+
+            // Create fingerprint facet relation table
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("create_fingerprint_facet_relation_table"))) {
+                preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_facet_relation_index"))) {
                 preparedStatement.execute();
             }
 
