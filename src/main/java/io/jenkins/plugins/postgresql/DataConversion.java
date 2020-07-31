@@ -33,9 +33,9 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class DataConversionHandler {
+public class DataConversion {
 
-    private static final Logger LOGGER = Logger.getLogger(DataConversionHandler.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(DataConversion.class.getName());
 
     /**
      * TODO: THIS METHOD HAS PRIVATE SCOPE IN JENKINS CORE. SHOULD BE EXPOSED FROM THERE.
@@ -55,6 +55,14 @@ public class DataConversionHandler {
         return buf.toString();
     }
 
+    /**
+     * Constructs the JSON for fingerprint from the given metadata about the fingerprint fetched from
+     * PostgreSQL.
+     * @param fingerprintMetadata See {@link DataConversion#extractFingerprintMetadata(ResultSet, String)}
+     * @param usageMetadata See {@link DataConversion#extractUsageMetadata(ResultSet)}
+     * @param facets See {@link DataConversion#extractFacets(ResultSet)}
+     * @return
+     */
     static String constructFingerprintJSON(Map<String, String> fingerprintMetadata,
                                            Map<String, Fingerprint.RangeSet> usageMetadata,
                                            JSONArray facets) {
@@ -107,6 +115,9 @@ public class DataConversionHandler {
         return json.toString();
     }
 
+    /**
+     * Extracts the fingerprint metadata obtained from PostgreSQL in the form of {@link ResultSet}.
+     */
     static @NonNull Map<String,String> extractFingerprintMetadata(@NonNull ResultSet resultSet, @NonNull String id)
             throws SQLException {
         Map<String, String> fingerprintMetadata = new HashMap<>();
@@ -127,6 +138,10 @@ public class DataConversionHandler {
         return Collections.unmodifiableMap(fingerprintMetadata);
     }
 
+    /**
+     * Extracts the fingerprint's usage metadata (jobs and builds) obtained from PostgreSQL in the form of
+     * {@link ResultSet}.
+     */
     static @NonNull Map<String, Fingerprint.RangeSet> extractUsageMetadata(@NonNull ResultSet resultSet)
             throws SQLException {
         Map<String, Fingerprint.RangeSet> usageMetadata = new HashMap<>();
@@ -147,6 +162,9 @@ public class DataConversionHandler {
         return Collections.unmodifiableMap(usageMetadata);
     }
 
+    /**
+     * Extracts the fingerprint's facet metadata obtained from PostgreSQL in the form of {@link ResultSet}.
+     */
     static @NonNull JSONArray extractFacets(@NonNull ResultSet resultSet) throws SQLException {
         JSONArray facetsArray = new JSONArray();
         JSONObject facetsObject = new JSONObject();
@@ -170,6 +188,9 @@ public class DataConversionHandler {
         return facetsArray;
     }
 
+    /**
+     * Extracts the given fingerprint's facets in the form of JSON Strings.
+     */
     static @NonNull Map<String, List<String>> extractFacets(@NonNull Fingerprint fingerprint) throws SQLException {
         Map<String, List<String>> facetsMap = new HashMap<>();
 

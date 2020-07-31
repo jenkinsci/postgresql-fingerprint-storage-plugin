@@ -57,7 +57,7 @@ public class PostgreSQLConfiguration {
 
         GlobalFingerprintConfiguration.get().setStorage(postgreSQLFingerprintStorage);
 
-        PostgreSQLSchemaManager.performSchemaInitialization();
+        PostgreSQLSchemaInitialization.performSchemaInitialization();
     }
 
     public static void setConfiguration(String username, String password, String host, int port, String databaseName)

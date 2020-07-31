@@ -28,7 +28,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class PostgreSQLSchemaManager {
+public class PostgreSQLSchemaInitialization {
 
     public static void performSchemaInitialization() {
         try (Connection connection = PostgreSQLFingerprintStorage.get().getConnection()) {

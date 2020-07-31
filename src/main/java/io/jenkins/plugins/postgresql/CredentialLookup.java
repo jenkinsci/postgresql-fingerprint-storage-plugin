@@ -40,6 +40,9 @@ import java.util.List;
  */
 public class CredentialLookup {
 
+    /**
+     * Fetches the username from the given credential.
+     */
     static @NonNull String getUsernameFromCredential(@CheckForNull StandardUsernamePasswordCredentials credential) {
         if (credential == null) {
             return "";
@@ -47,6 +50,9 @@ public class CredentialLookup {
         return credential.getUsername();
     }
 
+    /**
+     * Fetches the password from the given credential.
+     */
     static @NonNull String getPasswordFromCredential(@CheckForNull StandardUsernamePasswordCredentials credential) {
         if (credential == null) {
             return "";
@@ -54,6 +60,9 @@ public class CredentialLookup {
         return credential.getPassword().getPlainText();
     }
 
+    /**
+     * Fetches the credential from the given credential id.
+     */
     static @CheckForNull StandardUsernamePasswordCredentials getCredential(String id) {
         List<StandardUsernamePasswordCredentials> credentials = CredentialsProvider.lookupCredentials(
                 StandardUsernamePasswordCredentials.class, Jenkins.get(), ACL.SYSTEM, Collections.emptyList());

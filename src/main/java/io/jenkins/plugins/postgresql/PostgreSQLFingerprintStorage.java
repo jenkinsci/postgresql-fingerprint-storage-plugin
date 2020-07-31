@@ -74,13 +74,16 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
         instanceId = Util.getDigestOf(new ByteArrayInputStream(InstanceIdentity.get().getPublic().getEncoded()));
     }
 
+    /**
+     * Creates and returns a connection to the PostgreSQL instance.
+     */
     public Connection getConnection() throws SQLException {
         return PostgreSQLConnection.getConnection(getHost(), getPort(), getDatabaseName(), getCredentialsId(), getSsl(),
                 getConnectionTimeout(), getSocketTimeout());
     }
 
     /**
-     * Saves the given fingerprint.
+     * Saves the given fingerprint inside the PostgreSQL instance.
      */
     public synchronized void save(@NonNull Fingerprint fingerprint) throws IOException {
         delete(fingerprint.getHashString());
@@ -127,7 +130,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 }
             }
 
-            Map<String, List<String>> facets = DataConversionHandler.extractFacets(fingerprint);
+            Map<String, List<String>> facets = DataConversion.extractFacets(fingerprint);
             for (Map.Entry<String, List<String>> entry : facets.entrySet()) {
                 String facetName = entry.getKey();
                 List<String> facetEntries = entry.getValue();
@@ -152,7 +155,8 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     }
 
     /**
-     * Returns the fingerprint associated with the given unique id and the Jenkins instance ID, from the storage.
+     * Returns the fingerprint associated with the given unique id and the Jenkins instance ID, from the PostgreSQL
+     * instance.
      */
     public @CheckForNull Fingerprint load(@NonNull String id) throws IOException {
         Fingerprint fingerprint = null;
@@ -164,7 +168,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
                 ResultSet resultSet = preparedStatement.executeQuery();
-                fingerprintMetadata = DataConversionHandler.extractFingerprintMetadata(resultSet, id);
+                fingerprintMetadata = DataConversion.extractFingerprintMetadata(resultSet, id);
             }
 
             if (fingerprintMetadata.size() == 0) {
@@ -178,7 +182,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
                 ResultSet resultSet = preparedStatement.executeQuery();
-                usageMetadata = DataConversionHandler.extractUsageMetadata(resultSet);
+                usageMetadata = DataConversion.extractUsageMetadata(resultSet);
             }
 
             JSONArray facets;
@@ -188,10 +192,10 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
                 ResultSet resultSet = preparedStatement.executeQuery();
-                facets = DataConversionHandler.extractFacets(resultSet);
+                facets = DataConversion.extractFacets(resultSet);
             }
 
-            String json = DataConversionHandler.constructFingerprintJSON(fingerprintMetadata, usageMetadata, facets);
+            String json = DataConversion.constructFingerprintJSON(fingerprintMetadata, usageMetadata, facets);
 
             fingerprint = (Fingerprint) XStreamHandler.getXStream().fromXML(json);
         } catch (SQLException e) {
@@ -203,7 +207,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     }
 
     /**
-     * Deletes the fingerprint with the given id.
+     * Deletes the fingerprint with the given id from the PostgreSQL instance.
      */
     public void delete(@NonNull String id) throws IOException {
         try (Connection connection = getConnection()) {
@@ -216,7 +220,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
         }
     }
 
-    public void delete(@NonNull String id, @NonNull Connection connection) throws SQLException {
+    private void delete(@NonNull String id, @NonNull Connection connection) throws SQLException {
         try (PreparedStatement preparedStatement = connection.prepareStatement(
                 Queries.getQuery("delete_fingerprint"))) {
             preparedStatement.setString(1, id);
@@ -240,7 +244,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     }
 
     /**
-     * Returns true if there's some data in the fingerprint database.
+     * Returns true if there are fingerprints associate with the instance ID inside PostgreSQL instance.
      */
     public boolean isReady() throws IOException {
         try (Connection connection = getConnection()) {
