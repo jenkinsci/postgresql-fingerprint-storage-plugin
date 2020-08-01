@@ -32,6 +32,9 @@ import java.util.Properties;
 
 public class PostgreSQLConnection {
 
+    /**
+     * Create a connection to PostgreSQL.
+     */
     public static Connection getConnection(String host, int port, String databaseName, String credentialsId,
                                            boolean ssl, int connectionTimeout, int socketTimeout) throws SQLException {
         StandardUsernamePasswordCredentials standardUsernamePasswordCredentials =
@@ -41,6 +44,9 @@ public class PostgreSQLConnection {
         return getConnection(host, port, databaseName, username, password, ssl, connectionTimeout, socketTimeout);
     }
 
+    /**
+     * Create a connection to PostgreSQL.
+     */
     public static Connection getConnection(String host, int port, String databaseName, String username, String password,
                                            boolean ssl, int connectionTimeout, int socketTimeout) throws SQLException {
         String url = "jdbc:postgresql://" + host + ":" + port + "/" + databaseName;

@@ -32,6 +32,9 @@ import hudson.util.XStream2;
 
 import java.util.ArrayList;
 
+/**
+ * Supports ORM to and from JSON using XStream's {@link JettisonMappedXmlDriver} driver.
+ */
 public class XStreamHandler {
 
     private static XStream2 XSTREAM;

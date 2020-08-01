@@ -30,6 +30,9 @@ import java.sql.SQLException;
 
 public class PostgreSQLSchemaInitialization {
 
+    /**
+     * Responsible for creating the fingerprint schema in PostgreSQL if it doesn't already exist.
+     */
     public static synchronized void performSchemaInitialization() {
         try (Connection connection = PostgreSQLFingerprintStorage.get().getConnection()) {
             connection.setAutoCommit(false);
