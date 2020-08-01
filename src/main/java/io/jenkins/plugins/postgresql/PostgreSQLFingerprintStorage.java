@@ -284,6 +284,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     @DataBoundSetter
     public void setHost(String host) {
         this.host = host;
+        PostgreSQLSchemaInitialization.performSchemaInitialization();
     }
 
     public int getPort() {
@@ -293,6 +294,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     @DataBoundSetter
     public void setPort(int port) {
         this.port = port;
+        PostgreSQLSchemaInitialization.performSchemaInitialization();
     }
 
     public String getDatabaseName() {
@@ -302,6 +304,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     @DataBoundSetter
     public void setDatabaseName(String databaseName) {
         this.databaseName = databaseName;
+        PostgreSQLSchemaInitialization.performSchemaInitialization();
     }
 
     public boolean getSsl() {
@@ -311,6 +314,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     @DataBoundSetter
     public void setSsl(boolean ssl) {
         this.ssl = ssl;
+        PostgreSQLSchemaInitialization.performSchemaInitialization();
     }
 
     public int getConnectionTimeout() {
@@ -320,6 +324,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     @DataBoundSetter
     public void setConnectionTimeout(int connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
+        PostgreSQLSchemaInitialization.performSchemaInitialization();
     }
 
     public int getSocketTimeout() {
@@ -329,6 +334,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     @DataBoundSetter
     public void setSocketTimeout(int socketTimeout) {
         this.socketTimeout = socketTimeout;
+        PostgreSQLSchemaInitialization.performSchemaInitialization();
     }
 
     public String getCredentialsId() {
@@ -338,6 +344,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     @DataBoundSetter
     public void setCredentialsId(String credentialsId) {
         this.credentialsId = credentialsId;
+        PostgreSQLSchemaInitialization.performSchemaInitialization();
     }
 
     public @NonNull String getUsername() {

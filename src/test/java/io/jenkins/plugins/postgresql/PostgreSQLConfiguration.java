@@ -56,8 +56,6 @@ public class PostgreSQLConfiguration {
         postgreSQLFingerprintStorage.setSsl(ssl);
 
         GlobalFingerprintConfiguration.get().setStorage(postgreSQLFingerprintStorage);
-
-        PostgreSQLSchemaInitialization.performSchemaInitialization();
     }
 
     public static void setConfiguration(String username, String password, String host, int port, String databaseName)

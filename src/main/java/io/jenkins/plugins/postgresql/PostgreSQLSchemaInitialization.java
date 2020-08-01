@@ -30,7 +30,7 @@ import java.sql.SQLException;
 
 public class PostgreSQLSchemaInitialization {
 
-    public static void performSchemaInitialization() {
+    public static synchronized void performSchemaInitialization() {
         try (Connection connection = PostgreSQLFingerprintStorage.get().getConnection()) {
             connection.setAutoCommit(false);
 
@@ -86,8 +86,8 @@ public class PostgreSQLSchemaInitialization {
             }
 
             connection.commit();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ignored) {
+
         }
     }
 
