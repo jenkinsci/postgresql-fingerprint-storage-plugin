@@ -33,6 +33,10 @@ import java.io.IOException;
 
 public class PostgreSQLConfiguration {
 
+    private static final int DEFAULT_CONNECTION_TIMEOUT = 3000;
+    private static final int DEFAULT_SOCKET_TIMEOUT = 3000;
+    private static final boolean DEFAULT_SSL = false;
+
     public static void setConfiguration(String username, String password, String host, int port, String databaseName,
                                         int connectionTimeout, int socketTimeout, boolean ssl) throws IOException {
         StandardUsernamePasswordCredentials standardUsernamePasswordCredentials = new UsernamePasswordCredentialsImpl(
@@ -60,7 +64,8 @@ public class PostgreSQLConfiguration {
 
     public static void setConfiguration(String username, String password, String host, int port, String databaseName)
             throws IOException {
-        setConfiguration(username, password, host, port, databaseName, 3000, 3000, false);
+        setConfiguration(username, password, host, port, databaseName, DEFAULT_CONNECTION_TIMEOUT,
+                DEFAULT_SOCKET_TIMEOUT, DEFAULT_SSL);
     }
 
 }
