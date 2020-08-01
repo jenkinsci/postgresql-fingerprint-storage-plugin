@@ -38,8 +38,7 @@ THE SOFTWARE.
     <packaging>hpi</packaging>
 
     <properties>
-        <jenkins.version>2.250-SNAPSHOT</jenkins.version>
-        <relativePath>../jenkins/</relativePath>
+        <jenkins.version>2.251-rc30290.abb0bdd06de9</jenkins.version>
         <java.level>8</java.level>
         <useBeta>true</useBeta>
     </properties>

@@ -25,6 +25,7 @@ package io.jenkins.plugins.postgresql;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Fingerprint;
+import jenkins.fingerprints.FileFingerprintStorage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -36,24 +37,6 @@ import java.util.logging.Logger;
 public class DataConversion {
 
     private static final Logger LOGGER = Logger.getLogger(DataConversion.class.getName());
-
-    /**
-     * TODO: THIS METHOD HAS PRIVATE SCOPE IN JENKINS CORE. SHOULD BE EXPOSED FROM THERE.
-     */
-    private static String serialize(Fingerprint.RangeSet src) {
-        StringBuilder buf = new StringBuilder(src.getRanges().size() * 10);
-        for (Fingerprint.Range r : src.getRanges()) {
-            if(buf.length() > 0) {
-                buf.append(',');
-            }
-            if(r.isSingle()) {
-                buf.append(r.getStart());
-            } else {
-                buf.append(r.getStart()).append('-').append(r.getEnd() - 1);
-            }
-        }
-        return buf.toString();
-    }
 
     /**
      * Constructs the JSON for fingerprint from the given metadata about the fingerprint fetched from
@@ -91,7 +74,7 @@ public class DataConversion {
             for (Map.Entry<String, Fingerprint.RangeSet> usage : usageMetadata.entrySet()) {
                 JSONObject jobAndBuild = new JSONObject();
                 jobAndBuild.put("string", usage.getKey());
-                jobAndBuild.put("ranges", serialize(usage.getValue()));
+                jobAndBuild.put("ranges", FileFingerprintStorage.serialize(usage.getValue()));
 
                 entryArray.put(jobAndBuild);
             }

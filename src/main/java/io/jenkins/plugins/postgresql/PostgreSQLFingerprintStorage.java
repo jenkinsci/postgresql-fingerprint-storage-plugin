@@ -261,6 +261,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             LOGGER.log(Level.WARNING, "Failed connecting to PostgreSQL.", e);
             throw new IOException(e);
         }
+        return false;
     }
 
     @Override
