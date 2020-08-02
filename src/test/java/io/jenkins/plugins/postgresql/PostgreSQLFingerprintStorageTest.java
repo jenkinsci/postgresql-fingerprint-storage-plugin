@@ -42,8 +42,7 @@ import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 
@@ -153,12 +152,12 @@ public class PostgreSQLFingerprintStorageTest {
         fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 33, "b"));
         fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 333, "c"));
 
-        System.out.println("We want to save:");
-        System.out.println(XStreamHandler.getXStream().toXML(fingerprintSaved));
-
         Fingerprint fingerprintLoaded = Fingerprint.load(id);
         assertThat(fingerprintLoaded, is(not(nullValue())));
-        assertThat(fingerprintSaved.toString(), is(equalTo(fingerprintLoaded.toString())));
+        assertThat(fingerprintLoaded.getHashString(), is(equalTo(fingerprintSaved.getHashString())));
+        assertThat(fingerprintLoaded.getFileName(), is(equalTo(fingerprintSaved.getFileName())));
+        assertThat(fingerprintLoaded.getTimestamp(), is(equalTo(fingerprintSaved.getTimestamp())));
+        assertThat(fingerprintSaved.getPersistedFacets(), containsInAnyOrder(fingerprintLoaded.getPersistedFacets().toArray()));
     }
 
     @Test
@@ -200,8 +199,23 @@ public class PostgreSQLFingerprintStorageTest {
             this.property = property;
         }
 
-        @Override public String toString() {
+        @Override
+        public String toString() {
             return "TestFacet[" + property + "@" + getTimestamp() + "]";
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (object == this) {
+                return true;
+            }
+
+            if (!(object instanceof TestFacet)) {
+                return false;
+            }
+
+            TestFacet testFacet = (TestFacet) object;
+            return this.toString().equals(testFacet.toString());
         }
     }
 

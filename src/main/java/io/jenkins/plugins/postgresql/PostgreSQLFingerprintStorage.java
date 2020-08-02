@@ -240,7 +240,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
 
     @Override
     public void iterateAndCleanupFingerprints(TaskListener taskListener) {
-
+        // TODO
     }
 
     private String host = PostgreSQLFingerprintStorageDescriptor.DEFAULT_HOST;
