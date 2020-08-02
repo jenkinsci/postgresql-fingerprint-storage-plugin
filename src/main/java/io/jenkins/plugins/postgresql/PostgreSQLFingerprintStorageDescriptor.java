@@ -84,14 +84,10 @@ public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDe
 
     @Restricted(NoExternalUse.class)
     public FormValidation doCheckCredentialsId(@AncestorInPath Item item, @QueryParameter String value) {
-        if (item == null) {
-            if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-                return FormValidation.ok();
-            }
-        } else {
-            if (!item.hasPermission(Item.EXTENDED_READ) && !item.hasPermission(CredentialsProvider.USE_ITEM)) {
-                return FormValidation.ok();
-            }
+        if ((item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)) ||
+                (item !=null && !item.hasPermission(Item.EXTENDED_READ) &&
+                        !item.hasPermission(CredentialsProvider.USE_ITEM))) {
+            return FormValidation.ok();
         }
         if (StringUtils.isBlank(value)) {
             return FormValidation.ok();
