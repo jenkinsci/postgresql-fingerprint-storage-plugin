@@ -169,6 +169,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             if (!resultSet.next()) {
+                resultSet.close();
                 return null;
             }
 
