@@ -23,17 +23,21 @@
  */
 package io.jenkins.plugins.postgresql;
 
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+@Restricted(NoExternalUse.class)
 public class PostgreSQLSchemaInitialization {
 
     /**
      * Responsible for creating the fingerprint schema in PostgreSQL if it doesn't already exist.
      */
-    public static synchronized void performSchemaInitialization() {
+    static synchronized void performSchemaInitialization() {
         try (Connection connection = PostgreSQLFingerprintStorage.get().getConnection()) {
             connection.setAutoCommit(false);
 

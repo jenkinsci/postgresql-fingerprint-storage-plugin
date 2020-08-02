@@ -29,12 +29,15 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Fingerprint;
 import hudson.util.HexBinaryConverter;
 import hudson.util.XStream2;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.util.ArrayList;
 
 /**
  * Supports ORM to and from JSON using XStream's {@link JettisonMappedXmlDriver} driver.
  */
+@Restricted(NoExternalUse.class)
 public class XStreamHandler {
 
     private static XStream2 XSTREAM;

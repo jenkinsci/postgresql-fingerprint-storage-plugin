@@ -29,12 +29,15 @@ import hudson.model.Fingerprint;
 import jenkins.fingerprints.FileFingerprintStorage;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.logging.Logger;
 
+@Restricted({NoExternalUse.class})
 public class DataConversion {
 
     private static final Logger LOGGER = Logger.getLogger(DataConversion.class.getName());

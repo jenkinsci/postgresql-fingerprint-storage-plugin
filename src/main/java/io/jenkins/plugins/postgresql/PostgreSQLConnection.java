@@ -24,18 +24,22 @@
 package io.jenkins.plugins.postgresql;
 
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
+import edu.umd.cs.findbugs.annotations.NonNull;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+@Restricted(NoExternalUse.class)
 public class PostgreSQLConnection {
 
     /**
      * Create a connection to PostgreSQL.
      */
-    public static Connection getConnection(String host, int port, String databaseName, String credentialsId,
+    static @NonNull Connection getConnection(String host, int port, String databaseName, String credentialsId,
                                            boolean ssl, int connectionTimeout, int socketTimeout) throws SQLException {
         StandardUsernamePasswordCredentials standardUsernamePasswordCredentials =
                 CredentialLookup.getCredential(credentialsId);
@@ -47,8 +51,8 @@ public class PostgreSQLConnection {
     /**
      * Create a connection to PostgreSQL.
      */
-    public static Connection getConnection(String host, int port, String databaseName, String username, String password,
-                                           boolean ssl, int connectionTimeout, int socketTimeout) throws SQLException {
+    static @NonNull Connection getConnection(String host, int port, String databaseName, String username, String password,
+                             boolean ssl, int connectionTimeout, int socketTimeout) throws SQLException {
         String url = "jdbc:postgresql://" + host + ":" + port + "/" + databaseName;
 
         Properties properties = new Properties();

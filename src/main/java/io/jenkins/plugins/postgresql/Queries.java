@@ -23,11 +23,16 @@
  */
 package io.jenkins.plugins.postgresql;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Properties;
 
+@Restricted(NoExternalUse.class)
 public class Queries {
 
     private static final String propertiesFileName = "Queries.properties";
@@ -42,7 +47,7 @@ public class Queries {
         }
     }
 
-    public static String getQuery(String query) throws SQLException {
+    static @NonNull String getQuery(@NonNull String query) throws SQLException {
         if (properties == null) {
             throw new SQLException("Unable to load property file: " + propertiesFileName);
         }

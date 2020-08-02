@@ -46,15 +46,16 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
 
+@Restricted(NoExternalUse.class)
 public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDescriptor {
 
-    public static final String DEFAULT_HOST = "localhost";
-    public static final int DEFAULT_PORT = 5432;
-    public static final String DEFAULT_DATABASE_NAME = "defaultDB";
-    public static final boolean DEFAULT_SSL = false;
-    public static final int DEFAULT_CONNECTION_TIMEOUT = 2000;
-    public static final int DEFAULT_SOCKET_TIMEOUT = 2000;
-    public static final String DEFAULT_CREDENTIALS_ID = "";
+    static final String DEFAULT_HOST = "localhost";
+    static final int DEFAULT_PORT = 5432;
+    static final String DEFAULT_DATABASE_NAME = "defaultDB";
+    static final boolean DEFAULT_SSL = false;
+    static final int DEFAULT_CONNECTION_TIMEOUT = 2000;
+    static final int DEFAULT_SOCKET_TIMEOUT = 2000;
+    static final String DEFAULT_CREDENTIALS_ID = "";
 
     @Override
     public @NonNull String getDisplayName() {

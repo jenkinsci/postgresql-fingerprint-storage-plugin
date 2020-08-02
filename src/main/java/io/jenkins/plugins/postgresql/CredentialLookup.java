@@ -31,6 +31,8 @@ import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.security.ACL;
 import jenkins.model.Jenkins;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +40,7 @@ import java.util.List;
 /**
  * Helper class to support credential operations.
  */
+@Restricted(NoExternalUse.class)
 public class CredentialLookup {
 
     /**
