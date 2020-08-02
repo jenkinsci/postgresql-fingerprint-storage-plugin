@@ -40,7 +40,12 @@ public class PostgreSQLSchemaInitialization {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("check_schema_exists"))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
-                if (resultSet.next() && resultSet.getInt("total") == 1) {
+                boolean schemaExists = false;
+                if (resultSet.next()) {
+                    schemaExists = (resultSet.getInt("total") == 1);
+                }
+                resultSet.close();
+                if (schemaExists) {
                     return;
                 }
             }
