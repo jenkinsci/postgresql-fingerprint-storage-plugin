@@ -38,6 +38,7 @@ import java.sql.SQLException;
 import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 
 public class PostgreSQLQueryTest {
@@ -163,6 +164,16 @@ public class PostgreSQLQueryTest {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
+                preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_facet_relation_table"))) {
+                preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("insert_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
@@ -177,12 +188,16 @@ public class PostgreSQLQueryTest {
                     Queries.getQuery("select_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
+                preparedStatement.setString(3, FINGERPRINT_ID);
+                preparedStatement.setString(4, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
                 assertThat(resultSet.getString("timestamp"), is(DATE));
                 assertThat(resultSet.getString("filename"), is(FINGERPRINT_FILENAME));
                 assertThat(resultSet.getString("original_job_name"), is(JOB_NAME));
                 assertThat(resultSet.getString("original_job_build"), is(Integer.toString(BUILD)));
+                assertThat(resultSet.getString("usages"), is(nullValue()));
+                assertThat(resultSet.getString("facets"), is(nullValue()));
             }
         }
     }
@@ -317,7 +332,6 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setString(4, json.toString());
                 preparedStatement.executeUpdate();
             }
-
         }
     }
 
