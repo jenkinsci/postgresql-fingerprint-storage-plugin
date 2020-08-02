@@ -27,6 +27,7 @@ import hudson.Util;
 import hudson.model.Fingerprint;
 import jenkins.fingerprints.FingerprintStorage;
 import jenkins.model.FingerprintFacet;
+import org.hamcrest.Matchers;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 import org.junit.Rule;
 import org.junit.Test;
@@ -42,7 +43,6 @@ import java.sql.SQLException;
 
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 
@@ -121,8 +121,8 @@ public class PostgreSQLFingerprintStorageTest {
         Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
 
         Fingerprint fingerprintLoaded = Fingerprint.load(id);
-        assertThat(fingerprintLoaded, is(not(nullValue())));
-        assertThat(fingerprintSaved.toString(), is(equalTo(fingerprintLoaded.toString())));
+        assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));
+        assertThat(fingerprintSaved.toString(), is(Matchers.equalTo(fingerprintLoaded.toString())));
     }
 
     @Test
@@ -138,8 +138,8 @@ public class PostgreSQLFingerprintStorageTest {
         System.out.println(XStreamHandler.getXStream().toXML(fingerprintSaved));
 
         Fingerprint fingerprintLoaded = Fingerprint.load(id);
-        assertThat(fingerprintLoaded, is(not(nullValue())));
-        assertThat(fingerprintSaved.toString(), is(equalTo(fingerprintLoaded.toString())));
+        assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));
+        assertThat(fingerprintSaved.toString(), is(Matchers.equalTo(fingerprintLoaded.toString())));
     }
 
     @Test
@@ -153,11 +153,11 @@ public class PostgreSQLFingerprintStorageTest {
         fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 333, "c"));
 
         Fingerprint fingerprintLoaded = Fingerprint.load(id);
-        assertThat(fingerprintLoaded, is(not(nullValue())));
-        assertThat(fingerprintLoaded.getHashString(), is(equalTo(fingerprintSaved.getHashString())));
-        assertThat(fingerprintLoaded.getFileName(), is(equalTo(fingerprintSaved.getFileName())));
-        assertThat(fingerprintLoaded.getTimestamp(), is(equalTo(fingerprintSaved.getTimestamp())));
-        assertThat(fingerprintSaved.getPersistedFacets(), containsInAnyOrder(fingerprintLoaded.getPersistedFacets().toArray()));
+        assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));
+        assertThat(fingerprintLoaded.getHashString(), is(Matchers.equalTo(fingerprintSaved.getHashString())));
+        assertThat(fingerprintLoaded.getFileName(), is(Matchers.equalTo(fingerprintSaved.getFileName())));
+        assertThat(fingerprintLoaded.getTimestamp(), is(Matchers.equalTo(fingerprintSaved.getTimestamp())));
+        assertThat(fingerprintSaved.getPersistedFacets(), Matchers.containsInAnyOrder(fingerprintLoaded.getPersistedFacets().toArray()));
     }
 
     @Test
@@ -165,7 +165,7 @@ public class PostgreSQLFingerprintStorageTest {
         setConfiguration();
         String id = Util.getDigestOf("loadingNonExistentFingerprintShouldReturnNull");
         Fingerprint fingerprint = Fingerprint.load(id);
-        assertThat(fingerprint, is(nullValue()));
+        assertThat(fingerprint, is(Matchers.nullValue()));
     }
 
     @Test
@@ -175,10 +175,10 @@ public class PostgreSQLFingerprintStorageTest {
         new Fingerprint(null, "foo.jar", Util.fromHexString(id));
         Fingerprint.delete(id);
         Fingerprint fingerprintLoaded = Fingerprint.load(id);
-        assertThat(fingerprintLoaded, is(nullValue()));
+        assertThat(fingerprintLoaded, is(Matchers.nullValue()));
         Fingerprint.delete(id);
         fingerprintLoaded = Fingerprint.load(id);
-        assertThat(fingerprintLoaded, is(nullValue()));
+        assertThat(fingerprintLoaded, is(Matchers.nullValue()));
     }
 
     @Test
