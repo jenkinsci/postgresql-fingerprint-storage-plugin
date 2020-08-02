@@ -42,8 +42,10 @@ public class XStreamHandler {
 
     private static XStream2 XSTREAM;
 
-    @NonNull
-    static XStream2 getXStream() {
+    /**
+     * Returns {@link XStream2} instance.
+     */
+    static @NonNull XStream2 getXStream() {
         return XSTREAM;
     }
 

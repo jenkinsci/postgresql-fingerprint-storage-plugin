@@ -31,6 +31,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Handles PostgreSQL schema initialization.
+ */
 @Restricted(NoExternalUse.class)
 public class PostgreSQLSchemaInitialization {
 

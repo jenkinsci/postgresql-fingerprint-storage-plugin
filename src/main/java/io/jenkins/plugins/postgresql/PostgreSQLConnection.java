@@ -33,6 +33,9 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * Provides connection to a PostgreSQL instance.
+ */
 @Restricted(NoExternalUse.class)
 public class PostgreSQLConnection {
 

@@ -46,6 +46,9 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Collections;
 
+/**
+ * Descriptor class for {@link PostgreSQLFingerprintStorage}.
+ */
 @Restricted(NoExternalUse.class)
 public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDescriptor {
 

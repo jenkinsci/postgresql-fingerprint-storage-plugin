@@ -32,6 +32,9 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * Reads SQL queries from {@link #propertiesFileName}.
+ */
 @Restricted(NoExternalUse.class)
 public class Queries {
 
@@ -47,6 +50,9 @@ public class Queries {
         }
     }
 
+    /**
+     * Returns the SQL query with the given query name from {@link #propertiesFileName}.
+     */
     static @NonNull String getQuery(@NonNull String query) throws SQLException {
         if (properties == null) {
             throw new SQLException("Unable to load property file: " + propertiesFileName);

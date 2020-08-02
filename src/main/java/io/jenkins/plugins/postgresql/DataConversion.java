@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+/**
+ * Helper class for handling converting of data from and to different data structures.
+ */
 @Restricted({NoExternalUse.class})
 public class DataConversion {
 

@@ -56,7 +56,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
 /**
- * Pluggable external fingerprint storage for fingerprints in PostgreSQL.
+ * Pluggable external fingerprint storage for fingerprints into PostgreSQL.
  */
 @Extension
 public class PostgreSQLFingerprintStorage extends FingerprintStorage {
