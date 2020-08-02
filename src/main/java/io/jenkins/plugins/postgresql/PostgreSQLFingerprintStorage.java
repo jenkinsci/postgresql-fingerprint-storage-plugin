@@ -99,9 +99,10 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 preparedStatement.setString(3, DATE_CONVERTER.toString(fingerprint.getTimestamp()));
                 preparedStatement.setString(4, fingerprint.getFileName());
 
-                if (fingerprint.getOriginal() != null) {
-                    preparedStatement.setString(5, fingerprint.getOriginal().getName());
-                    preparedStatement.setInt(6, fingerprint.getOriginal().getRun().number);
+                Fingerprint.BuildPtr original = fingerprint.getOriginal();
+                if (original != null) {
+                    preparedStatement.setString(5, original.getName());
+                    preparedStatement.setInt(6, original.getRun().number);
                 } else {
                     preparedStatement.setNull(5, Types.NULL);
                     preparedStatement.setNull(6, Types.NULL);
