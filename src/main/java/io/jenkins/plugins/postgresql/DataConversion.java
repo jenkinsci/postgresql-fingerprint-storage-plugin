@@ -25,7 +25,6 @@ package io.jenkins.plugins.postgresql;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.model.Fingerprint;
 import jenkins.fingerprints.FileFingerprintStorage;
 import org.json.JSONArray;
@@ -48,9 +47,9 @@ public class DataConversion {
      * @param facets See {@link DataConversion#extractFacets(String)}
      * @return
      */
-    static String constructFingerprintJSON(Map<String, String> fingerprintMetadata,
-                                           Map<String, Fingerprint.RangeSet> usageMetadata,
-                                           JSONArray facets) {
+    static @NonNull String constructFingerprintJSON(@NonNull Map<String, String> fingerprintMetadata,
+                                           @NonNull Map<String, Fingerprint.RangeSet> usageMetadata,
+                                           @NonNull JSONArray facets) {
         JSONObject json = new JSONObject();
         JSONObject fingerprint = new JSONObject();
         JSONArray md5sum = new JSONArray();
@@ -104,8 +103,7 @@ public class DataConversion {
      * Store Fingerprint metadata into a Map.
      */
     static @NonNull Map<String,String> extractFingerprintMetadata(@NonNull String id, String timestamp, String filename,
-                                                                  String originalJobName, String originalJobBuild)
-            throws SQLException {
+                                                                  String originalJobName, String originalJobBuild) {
         Map<String, String> fingerprintMetadata = new HashMap<>();
 
         fingerprintMetadata.put("timestamp", timestamp);

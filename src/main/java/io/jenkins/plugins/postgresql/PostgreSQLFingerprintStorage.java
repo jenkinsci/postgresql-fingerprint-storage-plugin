@@ -77,7 +77,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     /**
      * Creates and returns a connection to the PostgreSQL instance.
      */
-    public Connection getConnection() throws SQLException {
+    @NonNull Connection getConnection() throws SQLException {
         return PostgreSQLConnection.getConnection(getHost(), getPort(), getDatabaseName(), getCredentialsId(), getSsl(),
                 getConnectionTimeout(), getSocketTimeout());
     }
@@ -167,27 +167,25 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             preparedStatement.setString(2, instanceId);
             preparedStatement.setString(3, id);
             preparedStatement.setString(4, instanceId);
-            ResultSet resultSet = preparedStatement.executeQuery();
 
-            if (!resultSet.next()) {
-                resultSet.close();
-                return null;
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (!resultSet.next()) {
+                    return null;
+                }
+
+                Map<String, String> fingerprintMetadata = DataConversion.extractFingerprintMetadata(
+                        id,
+                        resultSet.getString("timestamp"),
+                        resultSet.getString("filename"),
+                        resultSet.getString("original_job_name"),
+                        resultSet.getString("original_job_build")
+                );
+                Map<String, Fingerprint.RangeSet> usageMetadata = DataConversion.extractUsageMetadata(
+                        resultSet.getString("usages"));
+                JSONArray facets = DataConversion.extractFacets(resultSet.getString("facets"));
+                String json = DataConversion.constructFingerprintJSON(fingerprintMetadata, usageMetadata, facets);
+                return (Fingerprint) XStreamHandler.getXStream().fromXML(json);
             }
-
-            Map<String,String> fingerprintMetadata = DataConversion.extractFingerprintMetadata(
-                    id,
-                    resultSet.getString("timestamp"),
-                    resultSet.getString("filename"),
-                    resultSet.getString("original_job_name"),
-                    resultSet.getString("original_job_build")
-            );
-            Map<String, Fingerprint.RangeSet> usageMetadata = DataConversion.extractUsageMetadata(
-                    resultSet.getString("usages"));
-            JSONArray facets = DataConversion.extractFacets(resultSet.getString("facets"));
-            resultSet.close();
-
-            String json = DataConversion.constructFingerprintJSON(fingerprintMetadata, usageMetadata, facets);
-            return (Fingerprint) XStreamHandler.getXStream().fromXML(json);
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "PostgreSQL failed in loading fingerprint: " + id, e);
             throw new IOException(e);
@@ -225,13 +223,12 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
              PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("select_fingerprint_exists_for_instance"))) {
             preparedStatement.setString(1, instanceId);
-            ResultSet resultSet = preparedStatement.executeQuery();
-            boolean isReady = false;
-            if (resultSet.next()) {
-                isReady = resultSet.getInt("total") > 0;
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                if (resultSet.next()) {
+                    return (resultSet.getInt("total") > 0);
+                }
+                return false;
             }
-            resultSet.close();
-            return isReady;
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Failed connecting to PostgreSQL.", e);
             throw new IOException(e);
