@@ -59,11 +59,6 @@ public class PostgreSQLSchemaInitialization {
                 preparedStatement.execute();
             }
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_index"))) {
-                preparedStatement.execute();
-            }
-
             // Create fingerprint job build relation table
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(

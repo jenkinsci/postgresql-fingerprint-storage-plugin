@@ -227,20 +227,6 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             preparedStatement.setString(2, instanceId);
             preparedStatement.executeUpdate();
         }
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                Queries.getQuery("delete_fingerprint_job_build_relation"))) {
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, instanceId);
-            preparedStatement.executeUpdate();
-        }
-
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                Queries.getQuery("delete_fingerprint_facet_relation"))) {
-            preparedStatement.setString(1, id);
-            preparedStatement.setString(2, instanceId);
-            preparedStatement.executeUpdate();
-        }
     }
 
     /**

@@ -104,6 +104,11 @@ public class PostgreSQLQueryTest {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_table"))) {
+                preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
                 preparedStatement.execute();
             }
@@ -122,6 +127,11 @@ public class PostgreSQLQueryTest {
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("create_fingerprint_schema"))) {
+                preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_table"))) {
                 preparedStatement.execute();
             }
 
@@ -186,8 +196,24 @@ public class PostgreSQLQueryTest {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_table"))) {
+                preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
                 preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("insert_fingerprint"))) {
+                preparedStatement.setString(1, FINGERPRINT_ID);
+                preparedStatement.setString(2, INSTANCE_ID);
+                preparedStatement.setString(3, DATE);
+                preparedStatement.setString(4, FINGERPRINT_FILENAME);
+                preparedStatement.setString(5, JOB_NAME);
+                preparedStatement.setInt(6, BUILD);
+                preparedStatement.executeUpdate();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -220,8 +246,24 @@ public class PostgreSQLQueryTest {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_table"))) {
+                preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("create_fingerprint_facet_relation_table"))) {
                 preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("insert_fingerprint"))) {
+                preparedStatement.setString(1, FINGERPRINT_ID);
+                preparedStatement.setString(2, INSTANCE_ID);
+                preparedStatement.setString(3, DATE);
+                preparedStatement.setString(4, FINGERPRINT_FILENAME);
+                preparedStatement.setString(5, JOB_NAME);
+                preparedStatement.setInt(6, BUILD);
+                preparedStatement.executeUpdate();
             }
 
             JSONObject json = new JSONObject();
@@ -262,6 +304,16 @@ public class PostgreSQLQueryTest {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
+                preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_facet_relation_table"))) {
+                preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("insert_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
@@ -269,6 +321,27 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setString(4, FINGERPRINT_FILENAME);
                 preparedStatement.setString(5, JOB_NAME);
                 preparedStatement.setInt(6, BUILD);
+                preparedStatement.executeUpdate();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("insert_fingerprint_job_build_relation"))) {
+                preparedStatement.setString(1, FINGERPRINT_ID);
+                preparedStatement.setString(2, INSTANCE_ID);
+                preparedStatement.setString(3, JOB_NAME);
+                preparedStatement.setInt(4, BUILD);
+                preparedStatement.executeUpdate();
+            }
+
+            JSONObject json = new JSONObject();
+            json.put("foo", "bar");
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("insert_fingerprint_facet_relation"))) {
+                preparedStatement.setString(1, FINGERPRINT_ID);
+                preparedStatement.setString(2, INSTANCE_ID);
+                preparedStatement.setString(3, "FingerprintFacet");
+                preparedStatement.setString(4, json.toString());
                 preparedStatement.executeUpdate();
             }
 
@@ -289,37 +362,6 @@ public class PostgreSQLQueryTest {
                     assertThat(fingerprintCount, is(0));
                 }
             }
-        }
-    }
-
-    @Test
-    public void testDeleteFingerprintJobBuildRelation() throws SQLException {
-        try (Connection connection = getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_schema"))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint_job_build_relation"))) {
-                preparedStatement.setString(1, FINGERPRINT_ID);
-                preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, JOB_NAME);
-                preparedStatement.setInt(4, BUILD);
-                preparedStatement.executeUpdate();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("delete_fingerprint_job_build_relation"))) {
-                preparedStatement.setString(1, FINGERPRINT_ID);
-                preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.executeUpdate();
-            }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("select_fingerprint_job_build_relation_count"))) {
@@ -330,40 +372,6 @@ public class PostgreSQLQueryTest {
                     int fingerprintCount = resultSet.getInt("total");
                     assertThat(fingerprintCount, is(0));
                 }
-            }
-        }
-    }
-
-    @Test
-    public void testDeleteFingerprintFacetRelation() throws SQLException {
-        try (Connection connection = getConnection()) {
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_schema"))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_facet_relation_table"))) {
-                preparedStatement.execute();
-            }
-
-            JSONObject json = new JSONObject();
-            json.put("foo", "bar");
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint_facet_relation"))) {
-                preparedStatement.setString(1, FINGERPRINT_ID);
-                preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, "FingerprintFacet");
-                preparedStatement.setString(4, json.toString());
-                preparedStatement.executeUpdate();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("delete_fingerprint_facet_relation"))) {
-                preparedStatement.setString(1, FINGERPRINT_ID);
-                preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.executeUpdate();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
