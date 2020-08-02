@@ -23,7 +23,9 @@
  */
 package io.jenkins.plugins.postgresql;
 
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.Nullable;
 import hudson.model.Fingerprint;
 import jenkins.fingerprints.FileFingerprintStorage;
 import org.json.JSONArray;
@@ -41,9 +43,9 @@ public class DataConversion {
     /**
      * Constructs the JSON for fingerprint from the given metadata about the fingerprint fetched from
      * PostgreSQL.
-     * @param fingerprintMetadata See {@link DataConversion#extractFingerprintMetadata(ResultSet, String)}
-     * @param usageMetadata See {@link DataConversion#extractUsageMetadata(ResultSet)}
-     * @param facets See {@link DataConversion#extractFacets(ResultSet)}
+     * @param fingerprintMetadata See {@link DataConversion#extractFingerprintMetadata(String, String, String, String, String)}
+     * @param usageMetadata See {@link DataConversion#extractUsageMetadata(String)}
+     * @param facets See {@link DataConversion#extractFacets(String)}
      * @return
      */
     static String constructFingerprintJSON(Map<String, String> fingerprintMetadata,
@@ -99,71 +101,74 @@ public class DataConversion {
     }
 
     /**
-     * Extracts the fingerprint metadata obtained from PostgreSQL in the form of {@link ResultSet}.
+     * Store Fingerprint metadata into a Map.
      */
-    static @NonNull Map<String,String> extractFingerprintMetadata(@NonNull ResultSet resultSet, @NonNull String id)
+    static @NonNull Map<String,String> extractFingerprintMetadata(@NonNull String id, String timestamp, String filename,
+                                                                  String originalJobName, String originalJobBuild)
             throws SQLException {
         Map<String, String> fingerprintMetadata = new HashMap<>();
 
-        if (resultSet.next()) {
-            String timestamp = resultSet.getString("timestamp");
-            String filename = resultSet.getString("filename");
-            String originalJobName = resultSet.getString("original_job_name");
-            String originalJobBuild = resultSet.getString("original_job_build");
-
-            fingerprintMetadata.put("timestamp", timestamp);
-            fingerprintMetadata.put("filename", filename);
-            fingerprintMetadata.put("id", id);
-            fingerprintMetadata.put("original_job_name", originalJobName);
-            fingerprintMetadata.put("original_job_build", originalJobBuild);
-        }
+        fingerprintMetadata.put("timestamp", timestamp);
+        fingerprintMetadata.put("filename", filename);
+        fingerprintMetadata.put("id", id);
+        fingerprintMetadata.put("original_job_name", originalJobName);
+        fingerprintMetadata.put("original_job_build", originalJobBuild);
 
         return Collections.unmodifiableMap(fingerprintMetadata);
     }
 
     /**
-     * Extracts the fingerprint's usage metadata (jobs and builds) obtained from PostgreSQL in the form of
-     * {@link ResultSet}.
+     * Extracts the fingerprint's usage metadata (jobs and builds) obtained from PostgreSQL.
      */
-    static @NonNull Map<String, Fingerprint.RangeSet> extractUsageMetadata(@NonNull ResultSet resultSet)
-            throws SQLException {
+    static @NonNull Map<String, Fingerprint.RangeSet> extractUsageMetadata(@CheckForNull String usagesAsJSONString) {
         Map<String, Fingerprint.RangeSet> usageMetadata = new HashMap<>();
 
-        while (resultSet.next()) {
-            String jobName = resultSet.getString("job");
-            int build = resultSet.getInt("build");
+        if (usagesAsJSONString != null) {
+            JSONArray usages = new JSONArray(usagesAsJSONString);
 
-            if (usageMetadata.containsKey(jobName)) {
-                usageMetadata.get(jobName).add(build);
-            } else {
-                Fingerprint.RangeSet rangeSet = new Fingerprint.RangeSet();
-                rangeSet.add(build);
-                usageMetadata.put(jobName, rangeSet);
+            for (int i = 0; i < usages.length(); i++) {
+                JSONObject usage = usages.getJSONObject(i);
+
+                String jobName = usage.getString("job");
+                int build = usage.getInt("build");
+
+                if (usageMetadata.containsKey(jobName)) {
+                    usageMetadata.get(jobName).add(build);
+                } else {
+                    Fingerprint.RangeSet rangeSet = new Fingerprint.RangeSet();
+                    rangeSet.add(build);
+                    usageMetadata.put(jobName, rangeSet);
+                }
             }
         }
-
+        
         return Collections.unmodifiableMap(usageMetadata);
     }
 
     /**
      * Extracts the fingerprint's facet metadata obtained from PostgreSQL in the form of {@link ResultSet}.
      */
-    static @NonNull JSONArray extractFacets(@NonNull ResultSet resultSet) throws SQLException {
+    static @NonNull JSONArray extractFacets(@CheckForNull String facetsAsJSONString) {
         JSONArray facetsArray = new JSONArray();
         JSONObject facetsObject = new JSONObject();
 
-        while (resultSet.next()) {
-            String facetName = resultSet.getString("facet_name");
-            if (facetName.equals("")) {
-                break;
-            }
+        if (facetsAsJSONString != null) {
+            JSONArray facetsFromResultSet = new JSONArray(facetsAsJSONString);
 
-            if (facetsObject.has(facetName)) {
-                facetsObject.getJSONArray(facetName).put(new JSONObject(resultSet.getString("facet_entry")));
-            } else {
-                JSONArray facetEntries = new JSONArray();
-                facetEntries.put(new JSONObject(resultSet.getString("facet_entry")));
-                facetsObject.put(facetName, facetEntries);
+            for (int i = 0; i < facetsFromResultSet.length(); i++) {
+                JSONObject facetFromResultSet = facetsFromResultSet.getJSONObject(i);
+                String facetName = facetFromResultSet.getString("facet_name");
+                if (facetName.equals("")) {
+                    break;
+                }
+
+                if (facetsObject.has(facetName)) {
+                    facetsObject.getJSONArray(facetName).put(facetFromResultSet.getJSONObject("facet_entry"));
+                } else {
+                    JSONArray facetEntries = new JSONArray();
+                    facetEntries.put(facetFromResultSet.getJSONObject("facet_entry"));
+                    facetsObject.put(facetName, facetEntries);
+                }
             }
         }
 

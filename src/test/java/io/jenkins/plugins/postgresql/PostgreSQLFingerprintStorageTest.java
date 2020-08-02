@@ -69,6 +69,8 @@ public class PostgreSQLFingerprintStorageTest {
 
     @Test
     public void testSave() throws IOException, SQLException {
+        setConfiguration();
+
         String instanceId = Util.getDigestOf(new ByteArrayInputStream(InstanceIdentity.get().getPublic().getEncoded()));
         String id = Util.getDigestOf("testSave");
         Fingerprint fingerprint = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
@@ -118,7 +120,6 @@ public class PostgreSQLFingerprintStorageTest {
         String id = Util.getDigestOf("roundTrip");
 
         Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
-        fingerprintSaved.add("bar", 3);
 
         Fingerprint fingerprintLoaded = Fingerprint.load(id);
         assertThat(fingerprintLoaded, is(not(nullValue())));
