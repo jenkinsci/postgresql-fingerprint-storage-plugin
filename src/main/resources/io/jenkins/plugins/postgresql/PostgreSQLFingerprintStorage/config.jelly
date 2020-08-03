@@ -46,7 +46,7 @@ THE SOFTWARE.
     </f:entry>
     <f:validateButton
             title="${%Test PostgreSQL Connection}" progress="${%Testing...}"
-            method="testPostgreSQLConnection" with="host,port,database,credentialsId,ssl,connectionTimeout,socketTimeout"
+            method="testPostgreSQLConnection" with="host,port,databaseName,credentialsId,ssl,connectionTimeout,socketTimeout"
     />
     <f:entry title="">
         CAUTION: It is the responsibility of the admins to ensure the security of the PostgreSQL instance as fingerprints
