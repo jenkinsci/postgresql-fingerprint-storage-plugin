@@ -85,7 +85,6 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
      * Saves the given fingerprint inside the PostgreSQL instance.
      */
     public synchronized void save(@NonNull Fingerprint fingerprint) throws IOException {
-        delete(fingerprint.getHashString());
         try (Connection connection = getConnection(this)) {
             connection.setAutoCommit(false);
 
