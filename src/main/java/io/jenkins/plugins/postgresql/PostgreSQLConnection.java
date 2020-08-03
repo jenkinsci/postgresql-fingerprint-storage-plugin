@@ -42,13 +42,21 @@ public class PostgreSQLConnection {
     /**
      * Create a connection to PostgreSQL.
      */
-    static @NonNull Connection getConnection(String host, int port, String databaseName, String credentialsId,
-                                           boolean ssl, int connectionTimeout, int socketTimeout) throws SQLException {
+    static @NonNull Connection getConnection(PostgreSQLFingerprintStorage postgreSQLFingerprintStorage)
+            throws SQLException {
         StandardUsernamePasswordCredentials standardUsernamePasswordCredentials =
-                CredentialLookup.getCredential(credentialsId);
+                CredentialLookup.getCredential(postgreSQLFingerprintStorage.getCredentialsId());
         String username = CredentialLookup.getUsernameFromCredential(standardUsernamePasswordCredentials);
         String password = CredentialLookup.getPasswordFromCredential(standardUsernamePasswordCredentials);
-        return getConnection(host, port, databaseName, username, password, ssl, connectionTimeout, socketTimeout);
+        return getConnection(
+                postgreSQLFingerprintStorage.getHost(),
+                postgreSQLFingerprintStorage.getPort(),
+                postgreSQLFingerprintStorage.getDatabaseName(),
+                username,
+                password,
+                postgreSQLFingerprintStorage.getSsl(),
+                postgreSQLFingerprintStorage.getConnectionTimeout(),
+                postgreSQLFingerprintStorage.getSocketTimeout());
     }
 
     /**

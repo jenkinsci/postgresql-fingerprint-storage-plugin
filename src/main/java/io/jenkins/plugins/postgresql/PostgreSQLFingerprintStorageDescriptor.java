@@ -132,7 +132,11 @@ public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDe
 
     protected void testConnection (String host, int port, String databaseName, String credentialsId, boolean ssl,
                                    int connectionTimeout, int socketTimeout) throws SQLException {
-        PostgreSQLConnection.getConnection(host, port, databaseName, credentialsId, ssl, connectionTimeout,
+        StandardUsernamePasswordCredentials standardUsernamePasswordCredentials =
+                CredentialLookup.getCredential(credentialsId);
+        String username = CredentialLookup.getUsernameFromCredential(standardUsernamePasswordCredentials);
+        String password = CredentialLookup.getPasswordFromCredential(standardUsernamePasswordCredentials);
+        PostgreSQLConnection.getConnection(host, port, databaseName, username, password, ssl, connectionTimeout,
                 socketTimeout);
     }
 

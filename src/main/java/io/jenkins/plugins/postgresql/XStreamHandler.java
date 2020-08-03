@@ -29,18 +29,16 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Fingerprint;
 import hudson.util.HexBinaryConverter;
 import hudson.util.XStream2;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
+import com.thoughtworks.xstream.XStream;
 
 import java.util.ArrayList;
 
 /**
  * Supports ORM to and from JSON using XStream's {@link JettisonMappedXmlDriver} driver.
  */
-@Restricted(NoExternalUse.class)
 public class XStreamHandler {
 
-    private static XStream2 XSTREAM;
+    private static XStream2 XSTREAM = new XStream2(new JettisonMappedXmlDriver());
 
     /**
      * Returns {@link XStream2} instance.
@@ -50,8 +48,7 @@ public class XStreamHandler {
     }
 
     static {
-        XSTREAM = new XStream2(new JettisonMappedXmlDriver());
-        XSTREAM.setMode(XStream2.NO_REFERENCES);
+        XSTREAM.setMode(XStream.NO_REFERENCES);
         XSTREAM.alias("fingerprint", Fingerprint.class);
         XSTREAM.alias("range", Fingerprint.Range.class);
         XSTREAM.alias("ranges", Fingerprint.RangeSet.class);

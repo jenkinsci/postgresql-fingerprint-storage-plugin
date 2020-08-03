@@ -40,8 +40,8 @@ public class PostgreSQLSchemaInitialization {
     /**
      * Responsible for creating the fingerprint schema in PostgreSQL if it doesn't already exist.
      */
-    static synchronized void performSchemaInitialization() {
-        try (Connection connection = PostgreSQLFingerprintStorage.get().getConnection()) {
+    static synchronized void performSchemaInitialization(PostgreSQLFingerprintStorage postgreSQLFingerprintStorage) {
+        try (Connection connection = PostgreSQLConnection.getConnection(postgreSQLFingerprintStorage)) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -96,7 +96,7 @@ public class PostgreSQLSchemaInitialization {
             }
 
             connection.commit();
-        } catch (SQLException ignored) {
+        } catch (SQLException e) {
 
         }
     }
