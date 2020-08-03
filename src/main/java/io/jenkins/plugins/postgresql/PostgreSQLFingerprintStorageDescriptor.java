@@ -52,13 +52,13 @@ import java.util.Collections;
 @Restricted(NoExternalUse.class)
 public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDescriptor {
 
-    static final String DEFAULT_HOST = "localhost";
-    static final int DEFAULT_PORT = 5432;
-    static final String DEFAULT_DATABASE_NAME = "defaultDB";
-    static final boolean DEFAULT_SSL = false;
-    static final int DEFAULT_CONNECTION_TIMEOUT = 2000;
-    static final int DEFAULT_SOCKET_TIMEOUT = 2000;
-    static final String DEFAULT_CREDENTIALS_ID = "";
+    public static final String DEFAULT_HOST = "localhost";
+    public static final int DEFAULT_PORT = 5432;
+    public static final String DEFAULT_DATABASE_NAME = "defaultDB";
+    public static final boolean DEFAULT_SSL = false;
+    public static final int DEFAULT_CONNECTION_TIMEOUT = 2000;
+    public static final int DEFAULT_SOCKET_TIMEOUT = 2000;
+    public static final String DEFAULT_CREDENTIALS_ID = "";
 
     @Override
     public @NonNull String getDisplayName() {
@@ -110,7 +110,7 @@ public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDe
 
     @RequirePOST
     @Restricted(NoExternalUse.class)
-    public FormValidation doTestRedisConnection(
+    public FormValidation doTestPostgreSQLConnection(
             @QueryParameter("host") final String host,
             @QueryParameter("port") final int port,
             @QueryParameter("databaseName") final String databaseName,
