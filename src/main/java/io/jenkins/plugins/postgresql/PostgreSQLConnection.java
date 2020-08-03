@@ -67,6 +67,11 @@ public class PostgreSQLConnection {
         properties.setProperty("connectTimeout", Integer.toString(connectionTimeout));
         properties.setProperty("socketTimeout", Integer.toString(socketTimeout));
 
+        try {
+            Class.forName("org.postgresql.Driver");
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
         return DriverManager.getConnection(url, properties);
     }
 
