@@ -84,8 +84,6 @@ public class PostgreSQLFingerprintStorageTest {
                     Queries.getQuery("select_fingerprint"))) {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
-                preparedStatement.setString(3, id);
-                preparedStatement.setString(4, instanceId);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
                 assertThat(resultSet.getString("timestamp"), is(equalTo(new DateConverter()
@@ -141,7 +139,7 @@ public class PostgreSQLFingerprintStorageTest {
 
         Fingerprint fingerprintLoaded = Fingerprint.load(id);
         assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));
-        assertThat(fingerprintSaved.toString(), is(Matchers.equalTo(fingerprintLoaded.toString())));
+        assertThat(fingerprintLoaded.toString(), is(Matchers.equalTo(fingerprintSaved.toString())));
     }
 
     @Test

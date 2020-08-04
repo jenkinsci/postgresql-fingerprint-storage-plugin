@@ -189,8 +189,6 @@ public class PostgreSQLQueryTest {
                     Queries.getQuery("select_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, FINGERPRINT_ID);
-                preparedStatement.setString(4, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
                 assertThat(resultSet.getString("timestamp"), is(DATE));
@@ -250,8 +248,6 @@ public class PostgreSQLQueryTest {
                     Queries.getQuery("select_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, FINGERPRINT_ID);
-                preparedStatement.setString(4, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
                 assertThat(resultSet.getString("timestamp"), is(DATE));
@@ -316,8 +312,6 @@ public class PostgreSQLQueryTest {
                     Queries.getQuery("select_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, FINGERPRINT_ID);
-                preparedStatement.setString(4, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
                 assertThat(resultSet.getString("timestamp"), is(DATE));

@@ -163,8 +163,6 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
 
             preparedStatement.setString(1, id);
             preparedStatement.setString(2, instanceId);
-            preparedStatement.setString(3, id);
-            preparedStatement.setString(4, instanceId);
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (!resultSet.next()) {
