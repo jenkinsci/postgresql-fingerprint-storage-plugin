@@ -64,6 +64,11 @@ public class PostgreSQLFingerprintStorageTest {
                 postgres.getFirstMappedPort(), postgres.getDatabaseName());
     }
 
+    public void setIncorrectConfiguration() throws IOException {
+        PostgreSQLConfiguration.setConfiguration(postgres.getUsername(), postgres.getPassword(), "IncorrectHost",
+                postgres.getFirstMappedPort(), postgres.getDatabaseName());
+    }
+
     @Test
     public void checkFingerprintStorageIsPostgreSQL() throws IOException {
         setConfiguration();
@@ -204,6 +209,31 @@ public class PostgreSQLFingerprintStorageTest {
         String id = Util.getDigestOf("testIsReady");
         new Fingerprint(null, "foo.jar", Util.fromHexString(id));
         assertThat(fingerprintStorage.isReady(), is(true));
+    }
+
+    @Test(expected=IOException.class)
+    public void shouldFailSavingWithIncorrectPostgreSQLConfig() throws IOException {
+        setIncorrectConfiguration();
+        String id = Util.getDigestOf("shouldFailSavingWithIncorrectPostgreSQLConfig");
+        new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+    }
+
+    @Test(expected=IOException.class)
+    public void shouldFailLoadingWithIncorrectPostgreSQLConfig() throws IOException {
+        setConfiguration();
+        String id = Util.getDigestOf("shouldFailLoadingWithIncorrectPostgreSQLConfig");
+        new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+        setIncorrectConfiguration();
+        Fingerprint.load(id);
+    }
+
+    @Test(expected=IOException.class)
+    public void shouldFailDeletingWithIncorrectPostgreSQLConfig() throws IOException {
+        setConfiguration();
+        String id = Util.getDigestOf("shouldFailDeletingWithIncorrectPostgreSQLConfig");
+        new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+        setIncorrectConfiguration();
+        Fingerprint.delete(id);
     }
 
     public static final class TestFacet extends FingerprintFacet {
