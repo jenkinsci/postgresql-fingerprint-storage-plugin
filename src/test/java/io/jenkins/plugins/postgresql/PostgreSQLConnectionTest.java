@@ -117,7 +117,7 @@ public class PostgreSQLConnectionTest {
         final ToxiproxyContainer.ContainerProxy proxy = toxiproxy.getProxy(postgres, PORT);
         setConfigurationViaProxy(proxy);
 
-        String id = Util.getDigestOf("testRedisConnectionFailureForDelete");
+        String id = Util.getDigestOf("testPostgreSQLConnectionFailureForDelete");
         new Fingerprint(null, "foo.jar", Util.fromHexString(id));
 
         proxy.setConnectionCut(true);
@@ -169,7 +169,7 @@ public class PostgreSQLConnectionTest {
     }
 
     @Test
-    public void testSlowRedisConnectionForLoad() throws IOException {
+    public void testSlowPostgreSQLConnectionForLoad() throws IOException {
         exceptionRule.expect(IOException.class);
         exceptionRule.expectMessage(CONNECTION_ATTEMPT_FAILED);
 
@@ -178,12 +178,12 @@ public class PostgreSQLConnectionTest {
                 10 + (1000 * PostgreSQLConfiguration.DEFAULT_CONNECTION_TIMEOUT));
         setConfigurationViaProxy(proxy);
 
-        String id = Util.getDigestOf("testSlowRedisConnectionForLoad");
+        String id = Util.getDigestOf("testSlowPostgreSQLConnectionForLoad");
         Fingerprint.load(id);
     }
 
     @Test
-    public void testSlowRedisConnectionForDelete() throws IOException {
+    public void testSlowPostgreSQLConnectionForDelete() throws IOException {
         exceptionRule.expect(IOException.class);
         exceptionRule.expectMessage(CONNECTION_ATTEMPT_FAILED);
 
@@ -192,12 +192,12 @@ public class PostgreSQLConnectionTest {
                 10 + (1000 * PostgreSQLConfiguration.DEFAULT_CONNECTION_TIMEOUT));
         setConfigurationViaProxy(proxy);
 
-        String id = Util.getDigestOf("testSlowRedisConnectionForDelete");
+        String id = Util.getDigestOf("testSlowPostgreSQLConnectionForDelete");
         Fingerprint.delete(id);
     }
 
     @Test
-    public void testSlowRedisConnectionForIsReady() throws IOException {
+    public void testSlowPostgreSQLConnectionForIsReady() throws IOException {
         exceptionRule.expect(IOException.class);
         exceptionRule.expectMessage(CONNECTION_ATTEMPT_FAILED);
 
