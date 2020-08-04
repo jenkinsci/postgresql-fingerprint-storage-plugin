@@ -39,6 +39,7 @@ import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.core.Is.is;
 
 public class PostgreSQLQueryTest {
@@ -236,27 +237,12 @@ public class PostgreSQLQueryTest {
                 preparedStatement.executeUpdate();
             }
 
-            JSONObject json = new JSONObject();
-            json.put("foo", "bar");
-
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint_facet_relation"))) {
+                    Queries.getQuery("insert_fingerprint_job_build_relation"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, "FingerprintFacet");
-                preparedStatement.setString(4, json.toString());
-                preparedStatement.executeUpdate();
-            }
-
-            JSONObject json1 = new JSONObject();
-            json1.put("fooo", "barr");
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint_facet_relation"))) {
-                preparedStatement.setString(1, FINGERPRINT_ID);
-                preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, "FingerprintFacet");
-                preparedStatement.setString(4, json1.toString());
+                preparedStatement.setString(3, JOB_NAME);
+                preparedStatement.setInt(4, BUILD);
                 preparedStatement.executeUpdate();
             }
 
@@ -264,31 +250,18 @@ public class PostgreSQLQueryTest {
                     Queries.getQuery("select_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, FINGERPRINT_ID);
-                preparedStatement.setString(4, INSTANCE_ID);
+                preparedStatement.setString(3, JOB_NAME);
+                preparedStatement.setString(4, String.valueOf(BUILD));
                 ResultSet resultSet = preparedStatement.executeQuery();
-                while (resultSet.next()) {
-                    System.out.println(resultSet.getString("timestamp"));
-                    System.out.println(resultSet.getString("filename"));
-                    System.out.println(resultSet.getString("original_job_name"));
-                    System.out.println(resultSet.getString("original_job_build"));
-                    System.out.println(resultSet.getString("usages"));
-                    System.out.println(resultSet.getString("facets"));
-                }
-//                assertThat(resultSet.next(), is(true));
-//                assertThat(resultSet.getString("job"), is(JOB_NAME));
-//                assertThat(resultSet.getString("build"), is(Integer.toString(BUILD)));
+                assertThat(resultSet.next(), is(true));
+                assertThat(resultSet.getString("timestamp"), is(DATE));
+                assertThat(resultSet.getString("filename"), is(FINGERPRINT_FILENAME));
+                assertThat(resultSet.getString("original_job_name"), is(JOB_NAME));
+                assertThat(resultSet.getString("original_job_build"), is(Integer.toString(BUILD)));
+                assertThat(resultSet.getString("usages"), is(equalTo("[{\"job\" : \"" + JOB_NAME + "\", " +
+                        "\"build\" : " + BUILD + "}]")));
+                assertThat(resultSet.getString("facets"), is(nullValue()));;
             }
-
-//            try (PreparedStatement preparedStatement = connection.prepareStatement(
-//                    Queries.getQuery("select_fingerprint_job_build_relation"))) {
-//                preparedStatement.setString(1, FINGERPRINT_ID);
-//                preparedStatement.setString(2, INSTANCE_ID);
-//                ResultSet resultSet = preparedStatement.executeQuery();
-//                assertThat(resultSet.next(), is(true));
-//                assertThat(resultSet.getString("job"), is(JOB_NAME));
-//                assertThat(resultSet.getString("build"), is(Integer.toString(BUILD)));
-//            }
         }
     }
 
@@ -302,6 +275,11 @@ public class PostgreSQLQueryTest {
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("create_fingerprint_table"))) {
+                preparedStatement.execute();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
                 preparedStatement.execute();
             }
 
@@ -321,16 +299,32 @@ public class PostgreSQLQueryTest {
                 preparedStatement.executeUpdate();
             }
 
-            JSONObject json = new JSONObject();
-            json.put("foo", "bar");
+            JSONObject facetEntry = new JSONObject();
+            facetEntry.put("foo", "bar");
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery("insert_fingerprint_facet_relation"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setString(3, "FingerprintFacet");
-                preparedStatement.setString(4, json.toString());
+                preparedStatement.setString(4, facetEntry.toString());
                 preparedStatement.executeUpdate();
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery("select_fingerprint"))) {
+                preparedStatement.setString(1, FINGERPRINT_ID);
+                preparedStatement.setString(2, INSTANCE_ID);
+                preparedStatement.setString(3, JOB_NAME);
+                preparedStatement.setString(4, String.valueOf(BUILD));
+                ResultSet resultSet = preparedStatement.executeQuery();
+                assertThat(resultSet.next(), is(true));
+                assertThat(resultSet.getString("timestamp"), is(DATE));
+                assertThat(resultSet.getString("filename"), is(FINGERPRINT_FILENAME));
+                assertThat(resultSet.getString("original_job_name"), is(JOB_NAME));
+                assertThat(resultSet.getString("original_job_build"), is(Integer.toString(BUILD)));
+                assertThat(resultSet.getString("usages"), is(nullValue()));
+                assertThat(resultSet.getString("facets"), is(nullValue()));;
             }
         }
     }
