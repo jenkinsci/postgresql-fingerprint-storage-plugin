@@ -35,10 +35,10 @@ THE SOFTWARE.
     <f:entry title="SSL" field="ssl">
         <f:checkbox default="${descriptor.DEFAULT_SSL}"/>
     </f:entry>
-    <f:entry title="Connection Timeout (ms)" field="connectionTimeout">
+    <f:entry title="Connection Timeout (seconds)" field="connectionTimeout">
         <f:number default="${descriptor.DEFAULT_CONNECTION_TIMEOUT}"/>
     </f:entry>
-    <f:entry title="Socket Timeout (ms)" field="socketTimeout">
+    <f:entry title="Socket Timeout (seconds)" field="socketTimeout">
         <f:number default="${descriptor.DEFAULT_SOCKET_TIMEOUT}"/>
     </f:entry>
     <f:entry field="credentialsId" title="${%Credentials}">

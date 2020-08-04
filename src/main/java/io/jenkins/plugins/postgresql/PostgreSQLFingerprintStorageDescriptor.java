@@ -56,8 +56,8 @@ public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDe
     public static final int DEFAULT_PORT = 5432;
     public static final String DEFAULT_DATABASE_NAME = "defaultDB";
     public static final boolean DEFAULT_SSL = false;
-    public static final int DEFAULT_CONNECTION_TIMEOUT = 2000;
-    public static final int DEFAULT_SOCKET_TIMEOUT = 2000;
+    public static final int DEFAULT_CONNECTION_TIMEOUT = 1;
+    public static final int DEFAULT_SOCKET_TIMEOUT = 1;
     public static final String DEFAULT_CREDENTIALS_ID = "";
 
     @Override
