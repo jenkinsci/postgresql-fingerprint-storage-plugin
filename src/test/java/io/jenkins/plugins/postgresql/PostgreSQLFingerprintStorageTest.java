@@ -114,9 +114,23 @@ public class PostgreSQLFingerprintStorageTest {
     }
 
     @Test
-    public void roundTripWithUsages() throws IOException {
+    public void roundTripWithUsagesAndFacets() throws IOException {
         setConfiguration();
         String id = Util.getDigestOf("roundTrip");
+
+        Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+        fingerprintSaved.add("a", 3);
+        fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 3, "a"));
+
+        Fingerprint fingerprintLoaded = Fingerprint.load(id);
+        assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));
+        assertThat(fingerprintSaved.toString(), is(Matchers.equalTo(fingerprintLoaded.toString())));
+    }
+
+    @Test
+    public void roundTripWithUsages() throws IOException {
+        setConfiguration();
+        String id = Util.getDigestOf("roundTripWithUsages");
 
         Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
         fingerprintSaved.add("a", 3);
@@ -133,7 +147,7 @@ public class PostgreSQLFingerprintStorageTest {
     @Test
     public void roundTripWithFacets() throws IOException {
         setConfiguration();
-        String id = Util.getDigestOf("roundTrip");
+        String id = Util.getDigestOf("roundTripWithFacets");
 
         Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
         fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 3, "a"));
@@ -145,7 +159,8 @@ public class PostgreSQLFingerprintStorageTest {
         assertThat(fingerprintLoaded.getHashString(), is(Matchers.equalTo(fingerprintSaved.getHashString())));
         assertThat(fingerprintLoaded.getFileName(), is(Matchers.equalTo(fingerprintSaved.getFileName())));
         assertThat(fingerprintLoaded.getTimestamp(), is(Matchers.equalTo(fingerprintSaved.getTimestamp())));
-        assertThat(fingerprintSaved.getPersistedFacets(), Matchers.containsInAnyOrder(fingerprintLoaded.getPersistedFacets().toArray()));
+        assertThat(fingerprintSaved.getPersistedFacets(), Matchers.containsInAnyOrder(fingerprintLoaded
+                .getPersistedFacets().toArray()));
     }
 
     @Test
