@@ -33,8 +33,8 @@ import java.io.IOException;
 
 public class PostgreSQLConfiguration {
 
-    private static final int DEFAULT_CONNECTION_TIMEOUT = 3000;
-    private static final int DEFAULT_SOCKET_TIMEOUT = 3000;
+    private static final int DEFAULT_CONNECTION_TIMEOUT = 10;
+    private static final int DEFAULT_SOCKET_TIMEOUT = 10;
     private static final boolean DEFAULT_SSL = false;
 
     public static void setConfiguration(String username, String password, String host, int port, String databaseName,
