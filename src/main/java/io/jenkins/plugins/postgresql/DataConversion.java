@@ -112,8 +112,11 @@ public class DataConversion {
     /**
      * Store Fingerprint metadata into a Map.
      */
-    static @NonNull Map<String,String> extractFingerprintMetadata(@NonNull String id, String timestamp, String filename,
-                                                                  String originalJobName, String originalJobBuild) {
+    static @NonNull Map<String,String> extractFingerprintMetadata(@NonNull String id,
+                                                                  @NonNull String timestamp,
+                                                                  @NonNull String filename,
+                                                                  @CheckForNull String originalJobName,
+                                                                  @CheckForNull String originalJobBuild) {
         Map<String, String> fingerprintMetadata = new HashMap<>();
 
         fingerprintMetadata.put("timestamp", timestamp);
