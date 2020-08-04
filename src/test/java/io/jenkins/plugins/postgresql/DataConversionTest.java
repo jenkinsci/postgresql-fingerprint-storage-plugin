@@ -44,6 +44,11 @@ public class DataConversionTest {
     public static final int BUILD = 3;
 
     @Test
+    public void testConstructFingerprintJSON() {
+        // TODO
+    }
+
+    @Test
     public void testExtractFingerprintMetadata() {
         Map<String,String> fingerprintMetadata = DataConversion.extractFingerprintMetadata(
                 FINGERPRINT_ID, TIMESTAMP, FILENAME, JOB, String.valueOf(BUILD));
@@ -60,5 +65,15 @@ public class DataConversionTest {
         assertThat(fingerprintMetadata.get("filename"), is(equalTo(FILENAME)));
         assertThat(fingerprintMetadata.get("original_job_name"), is(nullValue()));
         assertThat(fingerprintMetadata.get("original_job_build"), is(nullValue()));
+    }
+
+    @Test
+    public void testExtractUsageMetadata() {
+        // TODO
+    }
+
+    @Test
+    public void testExtractFacets() {
+        // TODO
     }
 }
