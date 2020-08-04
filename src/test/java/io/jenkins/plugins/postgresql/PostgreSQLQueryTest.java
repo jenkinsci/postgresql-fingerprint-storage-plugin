@@ -306,8 +306,8 @@ public class PostgreSQLQueryTest {
                     Queries.getQuery("insert_fingerprint_facet_relation"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, FINGERPRINT_ID);
-                preparedStatement.setString(4, INSTANCE_ID);
+                preparedStatement.setString(3, "FingerprintFacet");
+                preparedStatement.setString(4, facetEntry.toString());
 
                 preparedStatement.executeUpdate();
             }
@@ -316,8 +316,8 @@ public class PostgreSQLQueryTest {
                     Queries.getQuery("select_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, JOB_NAME);
-                preparedStatement.setString(4, String.valueOf(BUILD));
+                preparedStatement.setString(3, FINGERPRINT_ID);
+                preparedStatement.setString(4, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
                 assertThat(resultSet.getString("timestamp"), is(DATE));
@@ -325,7 +325,8 @@ public class PostgreSQLQueryTest {
                 assertThat(resultSet.getString("original_job_name"), is(JOB_NAME));
                 assertThat(resultSet.getString("original_job_build"), is(Integer.toString(BUILD)));
                 assertThat(resultSet.getString("usages"), is(nullValue()));
-                assertThat(resultSet.getString("facets"), is(nullValue()));
+                assertThat(resultSet.getString("facets"), is(equalTo("[{\"facet_name\" : \"FingerprintFacet\", " +
+                        "\"facet_entry\" : {\"foo\": \"bar\"}}]")));
             }
         }
     }
