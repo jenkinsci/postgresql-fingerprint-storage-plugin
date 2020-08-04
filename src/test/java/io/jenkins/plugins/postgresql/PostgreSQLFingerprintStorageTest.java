@@ -23,6 +23,7 @@
  */
 package io.jenkins.plugins.postgresql;
 
+import com.thoughtworks.xstream.converters.basic.DateConverter;
 import hudson.Util;
 import hudson.model.Fingerprint;
 import jenkins.fingerprints.FingerprintStorage;
@@ -41,8 +42,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 
@@ -78,30 +81,22 @@ public class PostgreSQLFingerprintStorageTest {
 
         try (Connection connection = PostgreSQLConnection.getConnection(PostgreSQLFingerprintStorage.get())) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("select_fingerprint_count"))) {
+                    Queries.getQuery("select_fingerprint"))) {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
+                preparedStatement.setString(3, id);
+                preparedStatement.setString(4, instanceId);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getInt("total"), is(1));
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("select_fingerprint_job_build_relation_count"))) {
-                preparedStatement.setString(1, id);
-                preparedStatement.setString(2, instanceId);
-                ResultSet resultSet = preparedStatement.executeQuery();
-                assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getInt("total"), is(1));
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("select_fingerprint_facet_relation_count"))) {
-                preparedStatement.setString(1, id);
-                preparedStatement.setString(2, instanceId);
-                ResultSet resultSet = preparedStatement.executeQuery();
-                assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getInt("total"), is(1));
+                assertThat(resultSet.getString("timestamp"), is(equalTo(new DateConverter()
+                        .toString(fingerprint.getTimestamp()))));
+                assertThat(resultSet.getString("filename"), is(fingerprint.getFileName()));
+                assertThat(resultSet.getString("original_job_name"), is(nullValue()));
+                assertThat(resultSet.getString("original_job_build"), is(nullValue()));
+                assertThat(resultSet.getString("usages"), is(equalTo("[{\"job\" : \"a\", \"build\" : 3}]")));
+                assertThat(resultSet.getString("facets"), is(equalTo("[{" +
+                        "\"facet_name\" : \"io.jenkins.plugins.postgresql.PostgreSQLFingerprintStorageTest$TestFacet\", " +
+                        "\"facet_entry\" : {\"property\": \"a\", \"timestamp\": 3}}]")));
             }
         }
     }
