@@ -41,6 +41,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.instanceOf;
@@ -100,7 +102,7 @@ public class PostgreSQLFingerprintStorageTest {
     }
 
     @Test
-    public void roundTrip() throws IOException {
+    public void roundTripEmptyFingerprint() throws IOException {
         setConfiguration();
         String id = Util.getDigestOf("roundTrip");
 
@@ -112,21 +114,33 @@ public class PostgreSQLFingerprintStorageTest {
     }
 
     @Test
-    public void roundTripWithUsagesAndFacets() throws IOException {
+    public void roundTripWithMultipleFingerprints() throws IOException {
         setConfiguration();
-        String id = Util.getDigestOf("roundTrip");
 
-        Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
-        fingerprintSaved.add("a", 3);
-        fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 3, "a"));
+        String[] fingerprintIds = {
+                Util.getDigestOf("id1"),
+                Util.getDigestOf("id2"),
+                Util.getDigestOf("id3"),
+        };
 
-        Fingerprint fingerprintLoaded = Fingerprint.load(id);
-        assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));
-        assertThat(fingerprintSaved.toString(), is(Matchers.equalTo(fingerprintLoaded.toString())));
+        List<Fingerprint> savedFingerprints = new ArrayList<>();
+
+        for (String fingerprintId : fingerprintIds) {
+            Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(fingerprintId));
+            fingerprintSaved.add(fingerprintId, 3);
+            fingerprintSaved.getPersistedFacets().add(new TestFacet(fingerprintSaved, 3, fingerprintId));
+            savedFingerprints.add(fingerprintSaved);
+        }
+
+        for (Fingerprint fingerprintSaved : savedFingerprints) {
+            Fingerprint fingerprintLoaded = Fingerprint.load(fingerprintSaved.getHashString());
+            assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));
+            assertThat(fingerprintLoaded.toString(), is(Matchers.equalTo(fingerprintSaved.toString())));
+        }
     }
 
     @Test
-    public void roundTripWithUsages() throws IOException {
+    public void roundTripWithMultipleUsages() throws IOException {
         setConfiguration();
         String id = Util.getDigestOf("roundTripWithUsages");
 
@@ -143,7 +157,7 @@ public class PostgreSQLFingerprintStorageTest {
     }
 
     @Test
-    public void roundTripWithFacets() throws IOException {
+    public void roundTripWithMultipleFacets() throws IOException {
         setConfiguration();
         String id = Util.getDigestOf("roundTripWithFacets");
 
