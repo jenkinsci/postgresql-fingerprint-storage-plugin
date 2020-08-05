@@ -51,7 +51,7 @@ public class DataConversion {
     /**
      * Constructs the JSON for fingerprint from the given metadata about the fingerprint fetched from
      * PostgreSQL.
-     * @param fingerprintMetadata See {@link DataConversion#extractFingerprintMetadata(String, long, String, String, String)}
+     * @param fingerprintMetadata See {@link DataConversion#extractFingerprintMetadata(String, Timestamp, String, String, String)}
      * @param usageMetadata See {@link DataConversion#extractUsageMetadata(String)}
      * @param facets See {@link DataConversion#extractFacets(String)}
      * @return
