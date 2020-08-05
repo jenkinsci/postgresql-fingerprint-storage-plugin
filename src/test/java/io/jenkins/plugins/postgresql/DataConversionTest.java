@@ -27,6 +27,7 @@ import com.thoughtworks.xstream.converters.basic.DateConverter;
 import hudson.Util;
 import org.junit.Test;
 
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Map;
 
@@ -37,8 +38,9 @@ import static org.hamcrest.core.Is.is;
 
 public class DataConversionTest {
 
+    private static final DateConverter DATE_CONVERTER = new DateConverter();
     public static final String FINGERPRINT_ID = Util.getDigestOf("FINGERPRINT_ID");
-    public static final String TIMESTAMP = new DateConverter().toString(new Date());
+    public static final Timestamp TIMESTAMP = new Timestamp(new Date().getTime());
     public static final String FILENAME = "FILENAME";
     public static final String JOB = "JOB";
     public static final int BUILD = 3;
@@ -53,7 +55,8 @@ public class DataConversionTest {
         Map<String,String> fingerprintMetadata = DataConversion.extractFingerprintMetadata(
                 FINGERPRINT_ID, TIMESTAMP, FILENAME, JOB, String.valueOf(BUILD));
         assertThat(fingerprintMetadata.get("id"), is(equalTo(FINGERPRINT_ID)));
-        assertThat(fingerprintMetadata.get("timestamp"), is(equalTo(TIMESTAMP)));
+        assertThat(fingerprintMetadata.get("timestamp"), is(equalTo(DATE_CONVERTER.toString(
+                new Date(TIMESTAMP.getTime())))));
         assertThat(fingerprintMetadata.get("filename"), is(equalTo(FILENAME)));
         assertThat(fingerprintMetadata.get("original_job_name"), is(equalTo(JOB)));
         assertThat(fingerprintMetadata.get("original_job_build"), is(equalTo(String.valueOf(BUILD))));
@@ -61,7 +64,8 @@ public class DataConversionTest {
         fingerprintMetadata = DataConversion.extractFingerprintMetadata(
                 FINGERPRINT_ID, TIMESTAMP, FILENAME, null, null);
         assertThat(fingerprintMetadata.get("id"), is(equalTo(FINGERPRINT_ID)));
-        assertThat(fingerprintMetadata.get("timestamp"), is(equalTo(TIMESTAMP)));
+        assertThat(fingerprintMetadata.get("timestamp"), is(equalTo(DATE_CONVERTER.toString(new Date(
+                TIMESTAMP.getTime())))));
         assertThat(fingerprintMetadata.get("filename"), is(equalTo(FILENAME)));
         assertThat(fingerprintMetadata.get("original_job_name"), is(nullValue()));
         assertThat(fingerprintMetadata.get("original_job_build"), is(nullValue()));

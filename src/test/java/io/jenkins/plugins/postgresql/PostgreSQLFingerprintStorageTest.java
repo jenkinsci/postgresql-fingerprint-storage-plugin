@@ -93,8 +93,7 @@ public class PostgreSQLFingerprintStorageTest {
                 preparedStatement.setString(2, instanceId);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getString("timestamp"), is(equalTo(new DateConverter()
-                        .toString(fingerprint.getTimestamp()))));
+                assertThat(resultSet.getTimestamp("timestamp").getTime(), is(fingerprint.getTimestamp().getTime()));
                 assertThat(resultSet.getString("filename"), is(fingerprint.getFileName()));
                 assertThat(resultSet.getString("original_job_name"), is(nullValue()));
                 assertThat(resultSet.getString("original_job_build"), is(nullValue()));

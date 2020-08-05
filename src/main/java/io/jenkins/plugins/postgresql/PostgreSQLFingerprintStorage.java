@@ -38,11 +38,7 @@ import hudson.Util;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -94,7 +90,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                     Queries.getQuery("insert_fingerprint"))) {
                 preparedStatement.setString(1, fingerprint.getHashString());
                 preparedStatement.setString(2, instanceId);
-                preparedStatement.setString(3, DATE_CONVERTER.toString(fingerprint.getTimestamp()));
+                preparedStatement.setTimestamp(3, new Timestamp(fingerprint.getTimestamp().getTime()));
                 preparedStatement.setString(4, fingerprint.getFileName());
 
                 Fingerprint.BuildPtr original = fingerprint.getOriginal();
@@ -171,7 +167,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
 
                 Map<String, String> fingerprintMetadata = DataConversion.extractFingerprintMetadata(
                         id,
-                        resultSet.getString("timestamp"),
+                        resultSet.getTimestamp("timestamp"),
                         resultSet.getString("filename"),
                         resultSet.getString("original_job_name"),
                         resultSet.getString("original_job_build")

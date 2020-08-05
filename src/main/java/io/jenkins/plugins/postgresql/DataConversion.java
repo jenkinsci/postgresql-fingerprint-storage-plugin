@@ -23,6 +23,7 @@
  */
 package io.jenkins.plugins.postgresql;
 
+import com.thoughtworks.xstream.converters.basic.DateConverter;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Fingerprint;
@@ -34,11 +35,8 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.sql.Timestamp;
+import java.util.*;
 import java.util.logging.Logger;
 
 /**
@@ -48,11 +46,12 @@ import java.util.logging.Logger;
 public class DataConversion {
 
     private static final Logger LOGGER = Logger.getLogger(DataConversion.class.getName());
+    private static final DateConverter DATE_CONVERTER = new DateConverter();
 
     /**
      * Constructs the JSON for fingerprint from the given metadata about the fingerprint fetched from
      * PostgreSQL.
-     * @param fingerprintMetadata See {@link DataConversion#extractFingerprintMetadata(String, String, String, String, String)}
+     * @param fingerprintMetadata See {@link DataConversion#extractFingerprintMetadata(String, long, String, String, String)}
      * @param usageMetadata See {@link DataConversion#extractUsageMetadata(String)}
      * @param facets See {@link DataConversion#extractFacets(String)}
      * @return
@@ -113,13 +112,13 @@ public class DataConversion {
      * Store Fingerprint metadata into a Map.
      */
     static @NonNull Map<String,String> extractFingerprintMetadata(@NonNull String id,
-                                                                  @NonNull String timestamp,
+                                                                  Timestamp timestamp,
                                                                   @NonNull String filename,
                                                                   @CheckForNull String originalJobName,
                                                                   @CheckForNull String originalJobBuild) {
         Map<String, String> fingerprintMetadata = new HashMap<>();
 
-        fingerprintMetadata.put("timestamp", timestamp);
+        fingerprintMetadata.put("timestamp", DATE_CONVERTER.toString(new Date(timestamp.getTime())));
         fingerprintMetadata.put("filename", filename);
         fingerprintMetadata.put("id", id);
         fingerprintMetadata.put("original_job_name", originalJobName);
