@@ -23,7 +23,6 @@
  */
 package io.jenkins.plugins.postgresql;
 
-import com.thoughtworks.xstream.converters.basic.DateConverter;
 import hudson.Util;
 import org.json.JSONObject;
 import org.junit.Rule;
@@ -35,6 +34,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -44,7 +44,7 @@ import static org.hamcrest.core.Is.is;
 
 public class PostgreSQLQueryTest {
 
-    private static final String DATE = new DateConverter().toString(new Date());
+    public static final Timestamp TIMESTAMP = new Timestamp(new Date().getTime());
     private static final String INSTANCE_ID = "185d72052231445badce445130a11414";
     private static final String FINGERPRINT_FILENAME = "foo.jar";
     private static final String FINGERPRINT_ID = Util.getDigestOf("id");
@@ -178,7 +178,7 @@ public class PostgreSQLQueryTest {
                     Queries.getQuery("insert_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, DATE);
+                preparedStatement.setTimestamp(3, TIMESTAMP);
                 preparedStatement.setString(4, FINGERPRINT_FILENAME);
                 preparedStatement.setString(5, JOB_NAME);
                 preparedStatement.setInt(6, BUILD);
@@ -191,7 +191,7 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setString(2, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getString("timestamp"), is(DATE));
+                assertThat(resultSet.getTimestamp("timestamp"), is(TIMESTAMP));
                 assertThat(resultSet.getString("filename"), is(FINGERPRINT_FILENAME));
                 assertThat(resultSet.getString("original_job_name"), is(JOB_NAME));
                 assertThat(resultSet.getString("original_job_build"), is(Integer.toString(BUILD)));
@@ -228,7 +228,7 @@ public class PostgreSQLQueryTest {
                     Queries.getQuery("insert_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, DATE);
+                preparedStatement.setTimestamp(3, TIMESTAMP);
                 preparedStatement.setString(4, FINGERPRINT_FILENAME);
                 preparedStatement.setString(5, JOB_NAME);
                 preparedStatement.setInt(6, BUILD);
@@ -250,7 +250,7 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setString(2, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getString("timestamp"), is(DATE));
+                assertThat(resultSet.getTimestamp("timestamp"), is(TIMESTAMP));
                 assertThat(resultSet.getString("filename"), is(FINGERPRINT_FILENAME));
                 assertThat(resultSet.getString("original_job_name"), is(JOB_NAME));
                 assertThat(resultSet.getString("original_job_build"), is(Integer.toString(BUILD)));
@@ -288,7 +288,7 @@ public class PostgreSQLQueryTest {
                     Queries.getQuery("insert_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, DATE);
+                preparedStatement.setTimestamp(3, TIMESTAMP);
                 preparedStatement.setString(4, FINGERPRINT_FILENAME);
                 preparedStatement.setString(5, JOB_NAME);
                 preparedStatement.setInt(6, BUILD);
@@ -314,7 +314,7 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setString(2, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getString("timestamp"), is(DATE));
+                assertThat(resultSet.getTimestamp("timestamp"), is(TIMESTAMP));
                 assertThat(resultSet.getString("filename"), is(FINGERPRINT_FILENAME));
                 assertThat(resultSet.getString("original_job_name"), is(JOB_NAME));
                 assertThat(resultSet.getString("original_job_build"), is(Integer.toString(BUILD)));
@@ -352,7 +352,7 @@ public class PostgreSQLQueryTest {
                     Queries.getQuery("insert_fingerprint"))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
-                preparedStatement.setString(3, DATE);
+                preparedStatement.setTimestamp(3, TIMESTAMP);
                 preparedStatement.setString(4, FINGERPRINT_FILENAME);
                 preparedStatement.setString(5, JOB_NAME);
                 preparedStatement.setInt(6, BUILD);
