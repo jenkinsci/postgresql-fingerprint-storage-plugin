@@ -23,7 +23,6 @@
  */
 package io.jenkins.plugins.postgresql;
 
-import com.thoughtworks.xstream.converters.basic.DateConverter;
 import hudson.Util;
 import hudson.model.Fingerprint;
 import jenkins.fingerprints.FingerprintStorage;
@@ -88,17 +87,18 @@ public class PostgreSQLFingerprintStorageTest {
 
         try (Connection connection = PostgreSQLConnection.getConnection(PostgreSQLFingerprintStorage.get())) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("select_fingerprint"))) {
+                    Queries.getQuery(Queries.SELECT_FINGERPRINT))) {
                 preparedStatement.setString(1, id);
                 preparedStatement.setString(2, instanceId);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getTimestamp("timestamp").getTime(), is(fingerprint.getTimestamp().getTime()));
-                assertThat(resultSet.getString("filename"), is(fingerprint.getFileName()));
-                assertThat(resultSet.getString("original_job_name"), is(nullValue()));
-                assertThat(resultSet.getString("original_job_build"), is(nullValue()));
-                assertThat(resultSet.getString("usages"), is(equalTo("[{\"job\" : \"a\", \"build\" : 3}]")));
-                assertThat(resultSet.getString("facets"), is(equalTo("[{" +
+                assertThat(resultSet.getTimestamp(ColumnName.TIMESTAMP).getTime(),
+                        is(fingerprint.getTimestamp().getTime()));
+                assertThat(resultSet.getString(ColumnName.FILENAME), is(fingerprint.getFileName()));
+                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_NAME), is(nullValue()));
+                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD), is(nullValue()));
+                assertThat(resultSet.getString(ColumnName.USAGES), is(equalTo("[{\"job\" : \"a\", \"build\" : 3}]")));
+                assertThat(resultSet.getString(ColumnName.FACETS), is(equalTo("[{" +
                         "\"facet_name\" : \"io.jenkins.plugins.postgresql.PostgreSQLFingerprintStorageTest$TestFacet\", " +
                         "\"facet_entry\" : {\"property\": \"a\", \"timestamp\": 3}}]")));
             }

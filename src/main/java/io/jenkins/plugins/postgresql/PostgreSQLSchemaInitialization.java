@@ -55,11 +55,11 @@ public class PostgreSQLSchemaInitialization {
             connection.setAutoCommit(false);
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("check_schema_exists"))) {
+                    Queries.getQuery(Queries.CHECK_SCHEMA_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
                 boolean schemaExists = false;
                 if (resultSet.next()) {
-                    schemaExists = (resultSet.getInt("total") == 1);
+                    schemaExists = (resultSet.getInt(ColumnName.TOTAL) == 1);
                 }
                 resultSet.close();
                 if (schemaExists) {
@@ -70,38 +70,38 @@ public class PostgreSQLSchemaInitialization {
             // Create schema
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_schema"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
                 preparedStatement.execute();
             }
 
             // Create fingerprint table
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
                 preparedStatement.execute();
             }
 
             // Create fingerprint job build relation table
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_job_build_relation_index"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_INDEX))) {
                 preparedStatement.execute();
             }
 
             // Create fingerprint facet relation table
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_facet_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_facet_relation_index"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_INDEX))) {
                 preparedStatement.execute();
             }
 

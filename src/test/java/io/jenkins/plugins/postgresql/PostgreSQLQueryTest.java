@@ -62,15 +62,15 @@ public class PostgreSQLQueryTest {
     public void testCreateFingerprintSchema() throws SQLException {
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_schema"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("check_schema_exists"))) {
+                    Queries.getQuery(Queries.CHECK_SCHEMA_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getInt("total"), is(1));
+                assertThat(resultSet.getInt(ColumnName.TOTAL), is(1));
             }
         }
     }
@@ -79,20 +79,20 @@ public class PostgreSQLQueryTest {
     public void testCreateFingerprintTable() throws SQLException {
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_schema"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("check_fingerprint_table_exists"))) {
+                    Queries.getQuery(Queries.CHECK_FINGERPRINT_TABLE_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getInt("total"), is(1));
+                assertThat(resultSet.getInt(ColumnName.TOTAL), is(1));
             }
         }
     }
@@ -101,25 +101,25 @@ public class PostgreSQLQueryTest {
     public void testCreateFingerprintJobBuildRelationTable() throws SQLException {
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_schema"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("check_fingerprint_job_build_relation_table_exists"))) {
+                    Queries.getQuery(Queries.CHECK_FINGERPRINT_JOB_BUILD_RELATION_TABLE_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getInt("total"), is(1));
+                assertThat(resultSet.getInt(ColumnName.TOTAL), is(1));
             }
         }
     }
@@ -128,25 +128,25 @@ public class PostgreSQLQueryTest {
     public void testCreateFingerprintFacetRelationTable() throws SQLException {
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_schema"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_facet_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("check_fingerprint_facet_relation_table_exists"))) {
+                    Queries.getQuery(Queries.CHECK_FINGERPRINT_FACET_RELATION_TABLE_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getInt("total"), is(1));
+                assertThat(resultSet.getInt(ColumnName.TOTAL), is(1));
             }
         }
     }
@@ -155,27 +155,27 @@ public class PostgreSQLQueryTest {
     public void testInsertAndSelectFingerprint() throws SQLException {
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_schema"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_facet_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint"))) {
+                    Queries.getQuery(Queries.INSERT_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setTimestamp(3, TIMESTAMP);
@@ -186,17 +186,17 @@ public class PostgreSQLQueryTest {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("select_fingerprint"))) {
+                    Queries.getQuery(Queries.SELECT_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getTimestamp("timestamp"), is(TIMESTAMP));
-                assertThat(resultSet.getString("filename"), is(FINGERPRINT_FILENAME));
-                assertThat(resultSet.getString("original_job_name"), is(JOB_NAME));
-                assertThat(resultSet.getString("original_job_build"), is(Integer.toString(BUILD)));
-                assertThat(resultSet.getString("usages"), is(nullValue()));
-                assertThat(resultSet.getString("facets"), is(nullValue()));
+                assertThat(resultSet.getTimestamp(ColumnName.TIMESTAMP), is(TIMESTAMP));
+                assertThat(resultSet.getString(ColumnName.FILENAME), is(FINGERPRINT_FILENAME));
+                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_NAME), is(JOB_NAME));
+                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD), is(Integer.toString(BUILD)));
+                assertThat(resultSet.getString(ColumnName.USAGES), is(nullValue()));
+                assertThat(resultSet.getString(ColumnName.FACETS), is(nullValue()));
             }
         }
     }
@@ -205,27 +205,27 @@ public class PostgreSQLQueryTest {
     public void testInsertAndSelectFingerprintJobBuildRelation() throws SQLException {
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_schema"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_facet_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint"))) {
+                    Queries.getQuery(Queries.INSERT_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setTimestamp(3, TIMESTAMP);
@@ -236,7 +236,7 @@ public class PostgreSQLQueryTest {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint_job_build_relation"))) {
+                    Queries.getQuery(Queries.INSERT_FINGERPRINT_JOB_BUILD_RELATION))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setString(3, JOB_NAME);
@@ -245,18 +245,18 @@ public class PostgreSQLQueryTest {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("select_fingerprint"))) {
+                    Queries.getQuery(Queries.SELECT_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getTimestamp("timestamp"), is(TIMESTAMP));
-                assertThat(resultSet.getString("filename"), is(FINGERPRINT_FILENAME));
-                assertThat(resultSet.getString("original_job_name"), is(JOB_NAME));
-                assertThat(resultSet.getString("original_job_build"), is(Integer.toString(BUILD)));
-                assertThat(resultSet.getString("usages"), is(equalTo("[{\"job\" : \"" + JOB_NAME + "\", " +
+                assertThat(resultSet.getTimestamp(ColumnName.TIMESTAMP), is(TIMESTAMP));
+                assertThat(resultSet.getString(ColumnName.FILENAME), is(FINGERPRINT_FILENAME));
+                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_NAME), is(JOB_NAME));
+                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD), is(Integer.toString(BUILD)));
+                assertThat(resultSet.getString(ColumnName.USAGES), is(equalTo("[{\"job\" : \"" + JOB_NAME + "\", " +
                         "\"build\" : " + BUILD + "}]")));
-                assertThat(resultSet.getString("facets"), is(nullValue()));;
+                assertThat(resultSet.getString(ColumnName.FACETS), is(nullValue()));;
             }
         }
     }
@@ -265,27 +265,27 @@ public class PostgreSQLQueryTest {
     public void testInsertAndSelectFingerprintFacetRelation() throws SQLException {
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_schema"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_facet_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint"))) {
+                    Queries.getQuery(Queries.INSERT_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setTimestamp(3, TIMESTAMP);
@@ -299,7 +299,7 @@ public class PostgreSQLQueryTest {
             facetEntry.put("foo", "bar");
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint_facet_relation"))) {
+                    Queries.getQuery(Queries.INSERT_FINGERPRINT_FACET_RELATION))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setString(3, "FingerprintFacet");
@@ -309,17 +309,17 @@ public class PostgreSQLQueryTest {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("select_fingerprint"))) {
+                    Queries.getQuery(Queries.SELECT_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getTimestamp("timestamp"), is(TIMESTAMP));
-                assertThat(resultSet.getString("filename"), is(FINGERPRINT_FILENAME));
-                assertThat(resultSet.getString("original_job_name"), is(JOB_NAME));
-                assertThat(resultSet.getString("original_job_build"), is(Integer.toString(BUILD)));
-                assertThat(resultSet.getString("usages"), is(nullValue()));
-                assertThat(resultSet.getString("facets"), is(equalTo("[{\"facet_name\" : \"FingerprintFacet\", " +
+                assertThat(resultSet.getTimestamp(ColumnName.TIMESTAMP), is(TIMESTAMP));
+                assertThat(resultSet.getString(ColumnName.FILENAME), is(FINGERPRINT_FILENAME));
+                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_NAME), is(JOB_NAME));
+                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD), is(Integer.toString(BUILD)));
+                assertThat(resultSet.getString(ColumnName.USAGES), is(nullValue()));
+                assertThat(resultSet.getString(ColumnName.FACETS), is(equalTo("[{\"facet_name\" : \"FingerprintFacet\", " +
                         "\"facet_entry\" : {\"foo\": \"bar\"}}]")));
             }
         }
@@ -329,27 +329,27 @@ public class PostgreSQLQueryTest {
     public void testDeleteFingerprint() throws SQLException {
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_schema"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_job_build_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("create_fingerprint_facet_relation_table"))) {
+                    Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint"))) {
+                    Queries.getQuery(Queries.INSERT_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setTimestamp(3, TIMESTAMP);
@@ -360,7 +360,7 @@ public class PostgreSQLQueryTest {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint_job_build_relation"))) {
+                    Queries.getQuery(Queries.INSERT_FINGERPRINT_JOB_BUILD_RELATION))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setString(3, JOB_NAME);
@@ -372,7 +372,7 @@ public class PostgreSQLQueryTest {
             json.put("foo", "bar");
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("insert_fingerprint_facet_relation"))) {
+                    Queries.getQuery(Queries.INSERT_FINGERPRINT_FACET_RELATION))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setString(3, "FingerprintFacet");
@@ -381,41 +381,41 @@ public class PostgreSQLQueryTest {
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("delete_fingerprint"))) {
+                    Queries.getQuery(Queries.DELETE_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.executeUpdate();
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("select_fingerprint_count"))) {
+                    Queries.getQuery(Queries.SELECT_FINGERPRINT_COUNT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
-                    int fingerprintCount = resultSet.getInt("total");
+                    int fingerprintCount = resultSet.getInt(ColumnName.TOTAL);
                     assertThat(fingerprintCount, is(0));
                 }
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("select_fingerprint_job_build_relation_count"))) {
+                    Queries.getQuery(Queries.SELECT_FINGERPRINT_JOB_BUILD_RELATION_COUNT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
-                    int fingerprintCount = resultSet.getInt("total");
+                    int fingerprintCount = resultSet.getInt(ColumnName.TOTAL);
                     assertThat(fingerprintCount, is(0));
                 }
             }
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery("select_fingerprint_facet_relation_count"))) {
+                    Queries.getQuery(Queries.SELECT_FINGERPRINT_FACET_RELATION_COUNT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 ResultSet resultSet = preparedStatement.executeQuery();
                 if (resultSet.next()) {
-                    int fingerprintCount = resultSet.getInt("total");
+                    int fingerprintCount = resultSet.getInt(ColumnName.TOTAL);
                     assertThat(fingerprintCount, is(0));
                 }
             }

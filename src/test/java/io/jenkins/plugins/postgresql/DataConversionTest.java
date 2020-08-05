@@ -54,21 +54,21 @@ public class DataConversionTest {
     public void testExtractFingerprintMetadata() {
         Map<String,String> fingerprintMetadata = DataConversion.extractFingerprintMetadata(
                 FINGERPRINT_ID, TIMESTAMP, FILENAME, JOB, String.valueOf(BUILD));
-        assertThat(fingerprintMetadata.get("id"), is(equalTo(FINGERPRINT_ID)));
-        assertThat(fingerprintMetadata.get("timestamp"), is(equalTo(DATE_CONVERTER.toString(
+        assertThat(fingerprintMetadata.get(DataConversion.ID), is(equalTo(FINGERPRINT_ID)));
+        assertThat(fingerprintMetadata.get(DataConversion.TIMESTAMP), is(equalTo(DATE_CONVERTER.toString(
                 new Date(TIMESTAMP.getTime())))));
-        assertThat(fingerprintMetadata.get("filename"), is(equalTo(FILENAME)));
-        assertThat(fingerprintMetadata.get("original_job_name"), is(equalTo(JOB)));
-        assertThat(fingerprintMetadata.get("original_job_build"), is(equalTo(String.valueOf(BUILD))));
+        assertThat(fingerprintMetadata.get(DataConversion.FILENAME), is(equalTo(FILENAME)));
+        assertThat(fingerprintMetadata.get(DataConversion.ORIGINAL_JOB_NAME), is(equalTo(JOB)));
+        assertThat(fingerprintMetadata.get(DataConversion.ORIGINAL_JOB_BUILD), is(equalTo(String.valueOf(BUILD))));
 
         fingerprintMetadata = DataConversion.extractFingerprintMetadata(
                 FINGERPRINT_ID, TIMESTAMP, FILENAME, null, null);
-        assertThat(fingerprintMetadata.get("id"), is(equalTo(FINGERPRINT_ID)));
-        assertThat(fingerprintMetadata.get("timestamp"), is(equalTo(DATE_CONVERTER.toString(new Date(
+        assertThat(fingerprintMetadata.get(DataConversion.ID), is(equalTo(FINGERPRINT_ID)));
+        assertThat(fingerprintMetadata.get(DataConversion.TIMESTAMP), is(equalTo(DATE_CONVERTER.toString(new Date(
                 TIMESTAMP.getTime())))));
-        assertThat(fingerprintMetadata.get("filename"), is(equalTo(FILENAME)));
-        assertThat(fingerprintMetadata.get("original_job_name"), is(nullValue()));
-        assertThat(fingerprintMetadata.get("original_job_build"), is(nullValue()));
+        assertThat(fingerprintMetadata.get(DataConversion.FILENAME), is(equalTo(FILENAME)));
+        assertThat(fingerprintMetadata.get(DataConversion.ORIGINAL_JOB_NAME), is(nullValue()));
+        assertThat(fingerprintMetadata.get(DataConversion.ORIGINAL_JOB_BUILD), is(nullValue()));
     }
 
     @Test

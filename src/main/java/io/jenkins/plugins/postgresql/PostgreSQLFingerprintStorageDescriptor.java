@@ -60,6 +60,8 @@ public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDe
     public static final int DEFAULT_SOCKET_TIMEOUT = 1;
     public static final String DEFAULT_CREDENTIALS_ID = "";
 
+    private static final String SUCCESS = "Success";
+
     @Override
     public @NonNull String getDisplayName() {
         return Messages.PostgreSQLFingerprintStorage_DisplayName();
@@ -125,7 +127,7 @@ public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDe
         try {
             PostgreSQLSchemaInitialization.performSchemaInitialization(host, port, databaseName, credentialsId, ssl,
                     connectionTimeout, socketTimeout);
-            return FormValidation.ok("Success");
+            return FormValidation.ok(SUCCESS);
         } catch (Exception e) {
             return FormValidation.error("Schema initialization failed." + e.getMessage());
         }
@@ -147,7 +149,7 @@ public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDe
         }
         try {
             testConnection(host, port, databaseName, credentialsId, ssl, connectionTimeout, socketTimeout);
-            return FormValidation.ok("Success");
+            return FormValidation.ok(SUCCESS);
         } catch (Exception e) {
             return FormValidation.error("Connection error : " + e.getMessage());
         }

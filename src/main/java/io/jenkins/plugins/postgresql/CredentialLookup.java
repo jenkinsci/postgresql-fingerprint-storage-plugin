@@ -48,7 +48,7 @@ public class CredentialLookup {
      */
     static @NonNull String getUsernameFromCredential(@CheckForNull StandardUsernamePasswordCredentials credential) {
         if (credential == null) {
-            return "";
+            return DataConversion.EMPTY_STRING;
         }
         return credential.getUsername();
     }
@@ -58,7 +58,7 @@ public class CredentialLookup {
      */
     static @NonNull String getPasswordFromCredential(@CheckForNull StandardUsernamePasswordCredentials credential) {
         if (credential == null) {
-            return "";
+            return DataConversion.EMPTY_STRING;
         }
         return credential.getPassword().getPlainText();
     }

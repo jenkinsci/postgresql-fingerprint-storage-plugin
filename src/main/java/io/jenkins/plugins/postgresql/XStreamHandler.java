@@ -49,9 +49,9 @@ public class XStreamHandler {
 
     static {
         XSTREAM.setMode(XStream.NO_REFERENCES);
-        XSTREAM.alias("fingerprint", Fingerprint.class);
-        XSTREAM.alias("range", Fingerprint.Range.class);
-        XSTREAM.alias("ranges", Fingerprint.RangeSet.class);
+        XSTREAM.alias(DataConversion.FINGERPRINT, Fingerprint.class);
+        XSTREAM.alias(DataConversion.RANGE, Fingerprint.Range.class);
+        XSTREAM.alias(DataConversion.RANGES, Fingerprint.RangeSet.class);
         XSTREAM.registerConverter(new HexBinaryConverter(), 10);
         XSTREAM.registerConverter(new Fingerprint.RangeSet.ConverterImpl(
                 new CollectionConverter(XSTREAM.getMapper()) {

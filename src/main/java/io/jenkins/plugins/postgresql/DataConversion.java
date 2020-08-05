@@ -53,6 +53,29 @@ public class DataConversion {
     private static final Logger LOGGER = Logger.getLogger(DataConversion.class.getName());
     private static final DateConverter DATE_CONVERTER = new DateConverter();
 
+    static final String FINGERPRINT = "fingerprint";
+    static final String RANGES = "ranges";
+    static final String RANGE = "range";
+    static final String ID = "id";
+    static final String TIMESTAMP = "timestamp";
+    static final String FILENAME = "fileName";
+    static final String MD5SUM = "md5sum";
+    static final String FACETS = "facets";
+    static final String USAGES = "usages";
+    static final String ORIGINAL = "original";
+    static final String ORIGINAL_JOB_BUILD = "original_job_build";
+    static final String ORIGINAL_JOB_NAME = "original_job_name";
+    static final String NAME = "name";
+    static final String NUMBER = "number";
+    static final String STRING = "string";
+    static final String ENTRY = "entry";
+    static final String JOB = "job";
+    static final String BUILD = "build";
+    static final String FACET_NAME = "facet_name";
+    static final String FACET_ENTRY = "facet_entry";
+
+    static final String EMPTY_STRING = "usages";
+
     /**
      * Constructs the JSON for fingerprint from the given metadata about the fingerprint fetched from
      * PostgreSQL.
@@ -70,16 +93,16 @@ public class DataConversion {
         JSONArray usages = new JSONArray();
         JSONObject original = null;
 
-        if (fingerprintMetadata.get("original_job_build") != null) {
+        if (fingerprintMetadata.get(ORIGINAL_JOB_BUILD) != null) {
             original = new JSONObject();
-            original.put("name", fingerprintMetadata.get("original_job_name"));
-            original.put("number", Integer.parseInt(fingerprintMetadata.get("original_job_build")));
+            original.put(NAME, fingerprintMetadata.get(ORIGINAL_JOB_NAME));
+            original.put(NUMBER, Integer.parseInt(fingerprintMetadata.get(ORIGINAL_JOB_BUILD)));
         }
 
-        md5sum.put(fingerprintMetadata.get("id"));
+        md5sum.put(fingerprintMetadata.get(ID));
 
         if (facets.length() == 0) {
-            facets.put("");
+            facets.put(EMPTY_STRING);
         }
 
         if (usageMetadata.size() != 0) {
@@ -88,26 +111,26 @@ public class DataConversion {
 
             for (Map.Entry<String, Fingerprint.RangeSet> usage : usageMetadata.entrySet()) {
                 JSONObject jobAndBuild = new JSONObject();
-                jobAndBuild.put("string", usage.getKey());
-                jobAndBuild.put("ranges", FileFingerprintStorage.serialize(usage.getValue()));
+                jobAndBuild.put(STRING, usage.getKey());
+                jobAndBuild.put(RANGES, FileFingerprintStorage.serialize(usage.getValue()));
 
                 entryArray.put(jobAndBuild);
             }
 
-            entry.put("entry", entryArray);
+            entry.put(ENTRY, entryArray);
             usages.put(entry);
         } else {
-            usages.put("");
+            usages.put(EMPTY_STRING);
         }
 
-        fingerprint.put("timestamp", fingerprintMetadata.get("timestamp"));
-        fingerprint.put("fileName", fingerprintMetadata.get("filename"));
-        fingerprint.put("md5sum", md5sum);
-        fingerprint.put("facets", facets);
-        fingerprint.put("usages", usages);
-        fingerprint.put("original", original);
+        fingerprint.put(TIMESTAMP, fingerprintMetadata.get(TIMESTAMP));
+        fingerprint.put(FILENAME, fingerprintMetadata.get(FILENAME));
+        fingerprint.put(MD5SUM, md5sum);
+        fingerprint.put(FACETS, facets);
+        fingerprint.put(USAGES, usages);
+        fingerprint.put(ORIGINAL, original);
 
-        json.put("fingerprint", fingerprint);
+        json.put(FINGERPRINT, fingerprint);
 
         LOGGER.fine("Fingerprint loaded: " + json.toString());
         return json.toString();
@@ -123,11 +146,11 @@ public class DataConversion {
                                                                   @CheckForNull String originalJobBuild) {
         Map<String, String> fingerprintMetadata = new HashMap<>();
 
-        fingerprintMetadata.put("timestamp", DATE_CONVERTER.toString(new Date(timestamp.getTime())));
-        fingerprintMetadata.put("filename", filename);
-        fingerprintMetadata.put("id", id);
-        fingerprintMetadata.put("original_job_name", originalJobName);
-        fingerprintMetadata.put("original_job_build", originalJobBuild);
+        fingerprintMetadata.put(TIMESTAMP, DATE_CONVERTER.toString(new Date(timestamp.getTime())));
+        fingerprintMetadata.put(FILENAME, filename);
+        fingerprintMetadata.put(ID, id);
+        fingerprintMetadata.put(ORIGINAL_JOB_NAME, originalJobName);
+        fingerprintMetadata.put(ORIGINAL_JOB_BUILD, originalJobBuild);
 
         return Collections.unmodifiableMap(fingerprintMetadata);
     }
@@ -144,8 +167,8 @@ public class DataConversion {
             for (int i = 0; i < usages.length(); i++) {
                 JSONObject usage = usages.getJSONObject(i);
 
-                String jobName = usage.getString("job");
-                int build = usage.getInt("build");
+                String jobName = usage.getString(JOB);
+                int build = usage.getInt(BUILD);
 
                 if (usageMetadata.containsKey(jobName)) {
                     usageMetadata.get(jobName).add(build);
@@ -172,16 +195,16 @@ public class DataConversion {
 
             for (int i = 0; i < facetsFromResultSet.length(); i++) {
                 JSONObject facetFromResultSet = facetsFromResultSet.getJSONObject(i);
-                String facetName = facetFromResultSet.getString("facet_name");
-                if (facetName.equals("")) {
+                String facetName = facetFromResultSet.getString(FACET_NAME);
+                if (facetName.equals(EMPTY_STRING)) {
                     break;
                 }
 
                 if (facetsObject.has(facetName)) {
-                    facetsObject.getJSONArray(facetName).put(facetFromResultSet.getJSONObject("facet_entry"));
+                    facetsObject.getJSONArray(facetName).put(facetFromResultSet.getJSONObject(FACET_ENTRY));
                 } else {
                     JSONArray facetEntries = new JSONArray();
-                    facetEntries.put(facetFromResultSet.getJSONObject("facet_entry"));
+                    facetEntries.put(facetFromResultSet.getJSONObject(FACET_ENTRY));
                     facetsObject.put(facetName, facetEntries);
                 }
             }
@@ -198,11 +221,11 @@ public class DataConversion {
         Map<String, List<String>> facetsMap = new HashMap<>();
 
         JSONObject fingerprintJSON = new JSONObject(XStreamHandler.getXStream().toXML(fingerprint))
-                .getJSONObject("fingerprint");
+                .getJSONObject(FINGERPRINT);
 
-        JSONArray facetsJSON = fingerprintJSON.getJSONArray("facets");
+        JSONArray facetsJSON = fingerprintJSON.getJSONArray(FACETS);
 
-        if (facetsJSON.get(0).equals("")) {
+        if (facetsJSON.get(0).equals(EMPTY_STRING)) {
             return Collections.emptyMap();
         }
 
