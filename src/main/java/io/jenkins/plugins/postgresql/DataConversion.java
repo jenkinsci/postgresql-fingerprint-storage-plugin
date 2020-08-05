@@ -74,7 +74,9 @@ public class DataConversion {
     static final String FACET_NAME = "facet_name";
     static final String FACET_ENTRY = "facet_entry";
 
-    static final String EMPTY_STRING = "usages";
+    static final String EMPTY_STRING = "";
+
+    private static final String UNRECOGNIZED_JSON_STRUCTURE = "Unrecognized JSON Structure";
 
     /**
      * Constructs the JSON for fingerprint from the given metadata about the fingerprint fetched from
@@ -247,7 +249,7 @@ public class DataConversion {
                         facetEntriesList.add(facetEntry.toString());
                     }
                 } else {
-                    throw new SQLException("Unrecognized JSON Structure.");
+                    throw new SQLException(UNRECOGNIZED_JSON_STRUCTURE);
                 }
 
                 facetsMap.put(facetName, Collections.unmodifiableList(facetEntriesList));
