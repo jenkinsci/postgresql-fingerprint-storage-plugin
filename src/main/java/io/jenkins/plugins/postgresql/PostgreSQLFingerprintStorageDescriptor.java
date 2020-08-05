@@ -110,6 +110,29 @@ public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDe
 
     @RequirePOST
     @Restricted(NoExternalUse.class)
+    public FormValidation doInitializePostgreSQL(
+            @QueryParameter("host") final String host,
+            @QueryParameter("port") final int port,
+            @QueryParameter("databaseName") final String databaseName,
+            @QueryParameter("ssl") final boolean ssl,
+            @QueryParameter("credentialsId") final String credentialsId,
+            @QueryParameter("connectionTimeout") final int connectionTimeout,
+            @QueryParameter("socketTimeout") final int socketTimeout
+    ) throws IOException, ServletException {
+        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
+            return FormValidation.error("Need admin permission to perform this action");
+        }
+        try {
+            PostgreSQLSchemaInitialization.performSchemaInitialization(host, port, databaseName, credentialsId, ssl,
+                    connectionTimeout, socketTimeout);
+            return FormValidation.ok("Success");
+        } catch (Exception e) {
+            return FormValidation.error("Schema initialization failed." + e.getMessage());
+        }
+    }
+
+    @RequirePOST
+    @Restricted(NoExternalUse.class)
     public FormValidation doTestPostgreSQLConnection(
             @QueryParameter("host") final String host,
             @QueryParameter("port") final int port,

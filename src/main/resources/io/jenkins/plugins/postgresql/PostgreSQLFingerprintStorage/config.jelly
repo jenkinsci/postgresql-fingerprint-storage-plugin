@@ -48,8 +48,13 @@ THE SOFTWARE.
             title="${%Test PostgreSQL Connection}" progress="${%Testing...}"
             method="testPostgreSQLConnection" with="host,port,databaseName,credentialsId,ssl,connectionTimeout,socketTimeout"
     />
+    <f:validateButton
+            title="${%Perform PostgreSQL Schema Initialization}" progress="${%Initializing...}"
+            method="initializePostgreSQL" with="host,port,databaseName,credentialsId,ssl,connectionTimeout,socketTimeout"
+    />
     <f:entry title="">
         CAUTION: It is the responsibility of the admins to ensure the security of the PostgreSQL instance as fingerprints
-        may contain sensitive information.
+        may contain sensitive information. Initialization needs to be performed when a new storage is configured,
+        or when the database is cleared.
     </f:entry>
 </j:jelly>

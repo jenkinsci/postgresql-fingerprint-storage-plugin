@@ -37,11 +37,21 @@ import java.sql.SQLException;
 @Restricted(NoExternalUse.class)
 public class PostgreSQLSchemaInitialization {
 
+    static synchronized void performSchemaInitialization(PostgreSQLFingerprintStorage postgreSQLFingerprintStorage) {
+        performSchemaInitialization(postgreSQLFingerprintStorage.getHost(), postgreSQLFingerprintStorage.getPort(),
+                postgreSQLFingerprintStorage.getDatabaseName(), postgreSQLFingerprintStorage.getCredentialsId(),
+                postgreSQLFingerprintStorage.getSsl(), postgreSQLFingerprintStorage.getConnectionTimeout(),
+                postgreSQLFingerprintStorage.getSocketTimeout());
+    }
+
     /**
      * Responsible for creating the fingerprint schema in PostgreSQL if it doesn't already exist.
      */
-    static synchronized void performSchemaInitialization(PostgreSQLFingerprintStorage postgreSQLFingerprintStorage) {
-        try (Connection connection = PostgreSQLConnection.getConnection(postgreSQLFingerprintStorage)) {
+    static synchronized void performSchemaInitialization(String host, int port, String databaseName,
+                                                         String credentialsId, boolean ssl, int connectionTimeout,
+                                                         int socketTimeout) {
+        try (Connection connection = PostgreSQLConnection.getConnection(host, port, databaseName, credentialsId, ssl,
+                connectionTimeout, socketTimeout)) {
             connection.setAutoCommit(false);
 
             try (PreparedStatement preparedStatement = connection.prepareStatement(
@@ -96,7 +106,7 @@ public class PostgreSQLSchemaInitialization {
             }
 
             connection.commit();
-        } catch (SQLException e) {
+        } catch (SQLException ignored) {
 
         }
     }

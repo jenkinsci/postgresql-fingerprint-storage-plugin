@@ -59,6 +59,15 @@ public class PostgreSQLConnection {
                 postgreSQLFingerprintStorage.getSocketTimeout());
     }
 
+    static @NonNull Connection getConnection(String host, int port, String databaseName, String credentialsId,
+                                             boolean ssl, int connectionTimeout, int socketTimeout)
+            throws SQLException {
+        StandardUsernamePasswordCredentials credentials = CredentialLookup.getCredential(credentialsId);
+        String username = CredentialLookup.getUsernameFromCredential(credentials);
+        String password = CredentialLookup.getPasswordFromCredential(credentials);
+        return getConnection(host, port, databaseName, username, password, ssl, connectionTimeout, socketTimeout);
+    }
+
     /**
      * Create a connection to PostgreSQL.
      */
