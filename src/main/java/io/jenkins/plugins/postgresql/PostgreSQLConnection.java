@@ -39,6 +39,13 @@ import java.util.Properties;
 @Restricted(NoExternalUse.class)
 public class PostgreSQLConnection {
 
+    private static final String USER = "user";
+    private static final String PASSWORD = "password";
+    private static final String SSL = "ssl";
+    private static final String CONNECTION_TIMEOUT = "connectTimeout";
+    private static final String SOCKET_TIMEOUT = "socketTimeout";
+    private static final String JDBC_URL = "jdbc:postgresql://";
+
     /**
      * Create a connection to PostgreSQL.
      */
@@ -73,21 +80,21 @@ public class PostgreSQLConnection {
      */
     static @NonNull Connection getConnection(String host, int port, String databaseName, String username, String password,
                              boolean ssl, int connectionTimeout, int socketTimeout) throws SQLException {
-        String url = "jdbc:postgresql://" + host + ":" + port + "/" + databaseName;
+        String url = JDBC_URL + host + ":" + port + "/" + databaseName;
 
         Properties properties = new Properties();
-        properties.setProperty("user", username);
-        properties.setProperty("password", password);
+        properties.setProperty(USER, username);
+        properties.setProperty(PASSWORD, password);
         if (ssl) {
-            properties.setProperty("ssl", Boolean.toString(true));
+            properties.setProperty(SSL, Boolean.toString(true));
         }
-        properties.setProperty("connectTimeout", Integer.toString(connectionTimeout));
-        properties.setProperty("socketTimeout", Integer.toString(socketTimeout));
+        properties.setProperty(CONNECTION_TIMEOUT, Integer.toString(connectionTimeout));
+        properties.setProperty(SOCKET_TIMEOUT, Integer.toString(socketTimeout));
 
         try {
             Class.forName("org.postgresql.Driver");
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
+            throw new SQLException(e);
         }
         return DriverManager.getConnection(url, properties);
     }
