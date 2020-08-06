@@ -109,13 +109,13 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                     String jobName = usage.getKey();
                     Fingerprint.RangeSet rangeSet = usage.getValue();
 
-                    for (int build : rangeSet.listNumbers()) {
+                    for (int buildNumber : rangeSet.listNumbers()) {
                         try (PreparedStatement preparedStatement = connection.prepareStatement(
                                 Queries.getQuery(Queries.INSERT_FINGERPRINT_JOB_BUILD_RELATION))) {
                             preparedStatement.setString(1, fingerprint.getHashString());
                             preparedStatement.setString(2, instanceId);
                             preparedStatement.setString(3, jobName);
-                            preparedStatement.setInt(4, build);
+                            preparedStatement.setInt(4, buildNumber);
                             preparedStatement.executeUpdate();
                         }
                     }
@@ -168,7 +168,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                         resultSet.getTimestamp(ColumnName.TIMESTAMP),
                         resultSet.getString(ColumnName.FILENAME),
                         resultSet.getString(ColumnName.ORIGINAL_JOB_NAME),
-                        resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD)
+                        resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD_NUMBER)
                 );
                 Map<String, Fingerprint.RangeSet> usageMetadata = DataConversion.extractUsageMetadata(
                         resultSet.getString(ColumnName.USAGES));

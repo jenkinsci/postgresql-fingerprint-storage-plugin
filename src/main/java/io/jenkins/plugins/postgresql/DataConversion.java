@@ -63,14 +63,14 @@ public class DataConversion {
     static final String FACETS = "facets";
     static final String USAGES = "usages";
     static final String ORIGINAL = "original";
-    static final String ORIGINAL_JOB_BUILD = "original_job_build";
+    static final String ORIGINAL_JOB_BUILD_NUMBER = "original_job_build_number";
     static final String ORIGINAL_JOB_NAME = "original_job_name";
     static final String NAME = "name";
     static final String NUMBER = "number";
     static final String STRING = "string";
     static final String ENTRY = "entry";
     static final String JOB = "job";
-    static final String BUILD = "build";
+    static final String BUILD_NUMBER = "build_number";
     static final String FACET_NAME = "facet_name";
     static final String FACET_ENTRY = "facet_entry";
 
@@ -95,10 +95,10 @@ public class DataConversion {
         JSONArray usages = new JSONArray();
         JSONObject original = null;
 
-        if (fingerprintMetadata.get(ORIGINAL_JOB_BUILD) != null) {
+        if (fingerprintMetadata.get(ORIGINAL_JOB_BUILD_NUMBER) != null) {
             original = new JSONObject();
             original.put(NAME, fingerprintMetadata.get(ORIGINAL_JOB_NAME));
-            original.put(NUMBER, Integer.parseInt(fingerprintMetadata.get(ORIGINAL_JOB_BUILD)));
+            original.put(NUMBER, Integer.parseInt(fingerprintMetadata.get(ORIGINAL_JOB_BUILD_NUMBER)));
         }
 
         md5sum.put(fingerprintMetadata.get(ID));
@@ -112,11 +112,11 @@ public class DataConversion {
             JSONArray entryArray = new JSONArray();
 
             for (Map.Entry<String, Fingerprint.RangeSet> usage : usageMetadata.entrySet()) {
-                JSONObject jobAndBuild = new JSONObject();
-                jobAndBuild.put(STRING, usage.getKey());
-                jobAndBuild.put(RANGES, FileFingerprintStorage.serialize(usage.getValue()));
+                JSONObject jobAndBuildNumber = new JSONObject();
+                jobAndBuildNumber.put(STRING, usage.getKey());
+                jobAndBuildNumber.put(RANGES, FileFingerprintStorage.serialize(usage.getValue()));
 
-                entryArray.put(jobAndBuild);
+                entryArray.put(jobAndBuildNumber);
             }
 
             entry.put(ENTRY, entryArray);
@@ -145,14 +145,14 @@ public class DataConversion {
                                                                   Timestamp timestamp,
                                                                   @NonNull String filename,
                                                                   @CheckForNull String originalJobName,
-                                                                  @CheckForNull String originalJobBuild) {
+                                                                  @CheckForNull String originalJobBuildNumber) {
         Map<String, String> fingerprintMetadata = new HashMap<>();
 
         fingerprintMetadata.put(TIMESTAMP, DATE_CONVERTER.toString(new Date(timestamp.getTime())));
         fingerprintMetadata.put(FILENAME, filename);
         fingerprintMetadata.put(ID, id);
         fingerprintMetadata.put(ORIGINAL_JOB_NAME, originalJobName);
-        fingerprintMetadata.put(ORIGINAL_JOB_BUILD, originalJobBuild);
+        fingerprintMetadata.put(ORIGINAL_JOB_BUILD_NUMBER, originalJobBuildNumber);
 
         return Collections.unmodifiableMap(fingerprintMetadata);
     }
@@ -170,13 +170,13 @@ public class DataConversion {
                 JSONObject usage = usages.getJSONObject(i);
 
                 String jobName = usage.getString(JOB);
-                int build = usage.getInt(BUILD);
+                int buildNumber = usage.getInt(BUILD_NUMBER);
 
                 if (usageMetadata.containsKey(jobName)) {
-                    usageMetadata.get(jobName).add(build);
+                    usageMetadata.get(jobName).add(buildNumber);
                 } else {
                     Fingerprint.RangeSet rangeSet = new Fingerprint.RangeSet();
-                    rangeSet.add(build);
+                    rangeSet.add(buildNumber);
                     usageMetadata.put(jobName, rangeSet);
                 }
             }
