@@ -97,7 +97,8 @@ public class PostgreSQLFingerprintStorageTest {
                 assertThat(resultSet.getString(ColumnName.FILENAME), is(fingerprint.getFileName()));
                 assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_NAME), is(nullValue()));
                 assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD_NUMBER), is(nullValue()));
-                assertThat(resultSet.getString(ColumnName.USAGES), is(equalTo("[{\"job\" : \"a\", \"build\" : 3}]")));
+                assertThat(resultSet.getString(ColumnName.USAGES),
+                        is(equalTo("[{\"job\" : \"a\", \"build_number\" : 3}]")));
                 assertThat(resultSet.getString(ColumnName.FACETS), is(equalTo("[{" +
                         "\"facet_name\" : \"io.jenkins.plugins.postgresql.PostgreSQLFingerprintStorageTest$TestFacet\", " +
                         "\"facet_entry\" : {\"property\": \"a\", \"timestamp\": 3}}]")));

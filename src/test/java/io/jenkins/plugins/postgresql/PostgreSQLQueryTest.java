@@ -255,7 +255,7 @@ public class PostgreSQLQueryTest {
                 assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_NAME), is(JOB_NAME));
                 assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD_NUMBER), is(Integer.toString(BUILD_NUMBER)));
                 assertThat(resultSet.getString(ColumnName.USAGES), is(equalTo("[{\"job\" : \"" + JOB_NAME + "\", " +
-                        "\"build\" : " + BUILD_NUMBER + "}]")));
+                        "\"build_number\" : " + BUILD_NUMBER + "}]")));
                 assertThat(resultSet.getString(ColumnName.FACETS), is(nullValue()));;
             }
         }
