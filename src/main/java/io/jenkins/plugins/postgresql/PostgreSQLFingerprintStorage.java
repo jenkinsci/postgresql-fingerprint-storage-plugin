@@ -215,7 +215,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             preparedStatement.setString(1, instanceId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
-                    return (resultSet.getInt(ColumnName.TOTAL) > 0);
+                    return resultSet.getBoolean(ColumnName.EXISTS);
                 }
                 return false;
             }
