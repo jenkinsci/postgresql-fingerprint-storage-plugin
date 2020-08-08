@@ -23,9 +23,12 @@
  */
 package io.jenkins.plugins.postgresql;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.Util;
 import hudson.model.Fingerprint;
+import hudson.model.TaskListener;
 import jenkins.fingerprints.FingerprintStorage;
+import jenkins.fingerprints.GlobalFingerprintConfiguration;
 import jenkins.model.FingerprintFacet;
 import org.hamcrest.Matchers;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
@@ -35,7 +38,9 @@ import org.jvnet.hudson.test.JenkinsRule;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -148,10 +153,15 @@ public class PostgreSQLFingerprintStorageTest {
         setConfiguration();
         String id = Util.getDigestOf("roundTripWithUsages");
 
-        Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+        Fingerprint fingerprintSaved = new Fingerprint(new Fingerprint.BuildPtr("a", 2).getRun(), "foo.jar", Util.fromHexString(id));
         fingerprintSaved.add("a", 3);
-        fingerprintSaved.add("b", 33);
+        fingerprintSaved.add("a", 33);
         fingerprintSaved.add("c", 333);
+
+        Fingerprint fingerprintSaved3 = new Fingerprint(new Fingerprint.BuildPtr("c", 7).getRun(), "foo.jar", Util.fromHexString(Util.getDigestOf("roundTripWith")));
+        fingerprintSaved3.add("a", 3);
+
+        GlobalFingerprintConfiguration.get().getStorage().iterateAndCleanupFingerprints(new TestTaskListener());
 
         System.out.println(XStreamHandler.getXStream().toXML(fingerprintSaved));
 
@@ -261,6 +271,19 @@ public class PostgreSQLFingerprintStorageTest {
             TestFacet testFacet = (TestFacet) object;
             return this.toString().equals(testFacet.toString());
         }
+    }
+
+    private static class TestTaskListener implements TaskListener {
+
+        private ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        private PrintStream logStream = new PrintStream(outputStream);
+
+        @NonNull
+        @Override
+        public PrintStream getLogger() {
+            return logStream;
+        }
+
     }
 
 }
