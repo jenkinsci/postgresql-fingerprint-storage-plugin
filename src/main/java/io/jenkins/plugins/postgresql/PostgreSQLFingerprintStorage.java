@@ -213,7 +213,6 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     /**
      * Returns true if there are fingerprints associate with the instance ID inside PostgreSQL instance.
      */
-    @DataBoundSetter
     public boolean isReady() throws IOException {
         try (Connection connection = getConnection(this);
              PreparedStatement preparedStatement = connection.prepareStatement(
@@ -241,7 +240,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 if (!resultSet.next()) {
                     return;
                 }
-                
+
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Failed cleaning up fingerprints, unable to connect to PostgreSQL.", e);
