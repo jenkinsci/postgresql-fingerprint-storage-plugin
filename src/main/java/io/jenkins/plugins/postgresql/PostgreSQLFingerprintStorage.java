@@ -29,6 +29,7 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 
 import hudson.Extension;
 import hudson.ExtensionList;
+import hudson.model.Job;
 import hudson.model.TaskListener;
 import jenkins.fingerprints.FingerprintStorage;
 import hudson.model.Fingerprint;
@@ -38,14 +39,12 @@ import java.io.IOException;
 import java.io.ByteArrayInputStream;
 
 import java.sql.*;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jenkins.model.FingerprintFacet;
+import jenkins.model.Jenkins;
 import org.json.JSONArray;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 
@@ -236,14 +235,41 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
              PreparedStatement preparedStatement = connection.prepareStatement(
                      Queries.getQuery(Queries.SELECT_ALL_USAGES_IN_INSTANCE))) {
             preparedStatement.setString(1, instanceId);
+            preparedStatement.setString(2, instanceId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (!resultSet.next()) {
-                    return;
+                if (resultSet.next()) {
+                    System.out.println(resultSet.getString("usages"));
+                    System.out.println(resultSet.getString("original_usages"));
                 }
-
             }
-        } catch (SQLException e) {
+        } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Failed cleaning up fingerprints, unable to connect to PostgreSQL.", e);
+        }
+    }
+
+    public void update (Connection connection, JSONArray usages) {
+        for (int i = 0; i < usages.length(); i++) {
+            JSONObject usage = usages.getJSONObject(i);
+            String job = usage.getString("job");
+            List<Integer> jobBuildNumbers = new ArrayList<>();
+            for (String field : usage.getString("job").split(","))
+                jobBuildNumbers.add(Integer.parseInt(field));
+
+            Job jobInJenkins = Jenkins.get().getItemByFullName(job, Job.class);
+            if (jobInJenkins == null) {
+                // delete this job everywhere
+                continue;
+            }
+
+            List<Integer> jobsToRemove = new ArrayList<>();
+
+            for (int buildNumber : jobBuildNumbers) {
+                if (new Fingerprint.BuildPtr(job, buildNumber).getRun() == null) {
+                    jobsToRemove.add(buildNumber);
+                }
+            }
+
+
         }
     }
 
