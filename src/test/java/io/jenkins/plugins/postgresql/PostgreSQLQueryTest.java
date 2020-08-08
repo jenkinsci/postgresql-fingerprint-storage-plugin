@@ -304,6 +304,7 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setString(3, "FingerprintFacet");
                 preparedStatement.setString(4, facetEntry.toString());
+                preparedStatement.setBoolean(5, true);
 
                 preparedStatement.executeUpdate();
             }
@@ -377,6 +378,7 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setString(3, "FingerprintFacet");
                 preparedStatement.setString(4, json.toString());
+                preparedStatement.setBoolean(5, false);
                 preparedStatement.executeUpdate();
             }
 
