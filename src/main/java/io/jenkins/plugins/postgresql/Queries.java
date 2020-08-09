@@ -58,10 +58,6 @@ public class Queries {
     static final String SELECT_FINGERPRINT_COUNT = "select_fingerprint_count";
     static final String SELECT_FINGERPRINT_JOB_BUILD_RELATION_COUNT = "select_fingerprint_job_build_relation_count";
     static final String SELECT_FINGERPRINT_FACET_RELATION_COUNT = "select_fingerprint_facet_relation_count";
-    static final String SELECT_ALL_USAGES_IN_INSTANCE = "select_all_usages_in_instance";
-    static final String VACUUM = "vacuum";
-    static final String DELETE_JOB_FROM_FINGERPRINT_JOB_BUILD_RELATION =
-            "delete_job_from_fingerprint_job_build_relation";
 
     private static final String propertiesFileName = "Queries.properties";
     private static Properties properties;
