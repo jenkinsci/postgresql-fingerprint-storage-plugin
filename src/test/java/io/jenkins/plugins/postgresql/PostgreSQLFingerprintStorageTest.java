@@ -148,7 +148,7 @@ public class PostgreSQLFingerprintStorageTest {
         setConfiguration();
         String id = Util.getDigestOf("roundTripWithUsages");
 
-        Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));fingerprintSaved.add("a", 3);
+        Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
         fingerprintSaved.add("a", 3);
         fingerprintSaved.add("b", 33);
         fingerprintSaved.add("c", 333);
