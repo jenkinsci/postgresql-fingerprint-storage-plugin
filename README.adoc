@@ -17,7 +17,8 @@ The plugin allows users to configure PostgreSQL for storing fingerprints.
 
 Another plugin which supports link:https://github.com/jenkinsci/redis-fingerprint-storage-plugin/[
 storing fingerprints externally, but inside Redis instances] is also available.
-Consider trying it out too! It is much more stable than this plugin at the moment.
+Consider trying it out too! It is much more stable than this plugin at the moment,
+and also supports fingerprint cleanup, which is currently unsupported in this plugin.
 
 The plugin is currently under active development, please refer to the
 link:https://www.jenkins.io/projects/gsoc/2020/projects/external-fingerprint-storage/[project page] for the latest
