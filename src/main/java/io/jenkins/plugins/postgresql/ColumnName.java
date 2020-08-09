@@ -33,7 +33,6 @@ public class ColumnName {
     static final String ORIGINAL_JOB_NAME = "original_job_name";
     static final String ORIGINAL_JOB_BUILD = "original_job_build";
     static final String USAGES = "usages";
-    static final String ORIGINAL_USAGES = "original_usages";
     static final String FACETS = "facets";
     static final String TOTAL = "total";
 

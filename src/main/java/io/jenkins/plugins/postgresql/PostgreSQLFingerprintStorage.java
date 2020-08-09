@@ -29,7 +29,6 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 
 import hudson.Extension;
 import hudson.ExtensionList;
-import hudson.model.Job;
 import hudson.model.TaskListener;
 import jenkins.fingerprints.FingerprintStorage;
 import hudson.model.Fingerprint;
@@ -38,13 +37,18 @@ import hudson.Util;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
 
-import java.sql.*;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
+import java.util.Hashtable;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import jenkins.model.FingerprintFacet;
-import jenkins.model.Jenkins;
 import org.json.JSONArray;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 
@@ -81,7 +85,6 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
      * Saves the given fingerprint inside the PostgreSQL instance.
      */
     public synchronized void save(@NonNull Fingerprint fingerprint) throws IOException {
-
         try (Connection connection = getConnection(this)) {
             connection.setAutoCommit(false);
 
