@@ -45,15 +45,12 @@ import java.util.logging.Logger;
 
 import jenkins.model.FingerprintFacet;
 import jenkins.model.Jenkins;
-import jnr.ffi.annotations.In;
 import org.json.JSONArray;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 
 import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-
-import javax.annotation.PostConstruct;
 
 /**
  * Pluggable external fingerprint storage for fingerprints into PostgreSQL.
@@ -233,76 +230,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
 
     @Override
     public void iterateAndCleanupFingerprints(TaskListener taskListener) {
-        try (Connection connection = getConnection(this)) {
-            JSONArray usages = null;
-
-            // clean up the usages
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.SELECT_ALL_USAGES_IN_INSTANCE))) {
-                preparedStatement.setString(1, instanceId);
-                preparedStatement.setString(2, instanceId);
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    if (resultSet.next()) {
-                        usages = new JSONArray(resultSet.getString("usages"));
-                    }
-                }
-            }
-            if (usages != null) {
-                cleanUpUsages(connection, usages);
-            }
-
-            // clean up fingerprints
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.SELECT_ALL_USAGES_IN_INSTANCE))) {
-
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.VACUUM))) {
-                preparedStatement.executeUpdate();
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Failed cleaning up fingerprints, unable to connect to PostgreSQL.", e);
-        }
-
-    }
-
-    private void cleanUpUsages (Connection connection, JSONArray usages) throws SQLException{
-        for (int i = 0; i < usages.length(); i++) {
-            JSONObject usage = usages.getJSONObject(i);
-            String job = usage.getString("job");
-            List<Integer> jobBuildNumbers = new ArrayList<>();
-            for (String field : usage.getString("job").split(","))
-                jobBuildNumbers.add(Integer.parseInt(field));
-
-            if (Jenkins.get().getItemByFullName(job, Job.class) == null) {
-                try (PreparedStatement preparedStatement = connection.prepareStatement(
-                        Queries.getQuery(Queries.DELETE_JOB_FROM_FINGERPRINT_JOB_BUILD_RELATION))) {
-                    preparedStatement.setString(1, job);
-                    preparedStatement.executeUpdate();
-                }
-                continue;
-            }
-
-            List<Integer> jobsToRemove = new ArrayList<>();
-
-            for (int buildNumber : jobBuildNumbers) {
-                if (new Fingerprint.BuildPtr(job, buildNumber).getRun() == null) {
-                    jobsToRemove.add(buildNumber);
-                }
-            }
-
-            // delete the builds
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.VACUUM))) {
-                final java.sql.Array sqlArray = connection.createArrayOf("int", jobsToRemove);
-                statement.setArray(1, sqlArray);
-                preparedStatement.executeUpdate();
-            }
-
-
-        }
+        // TODO
     }
 
     private String host = PostgreSQLFingerprintStorageDescriptor.DEFAULT_HOST;
