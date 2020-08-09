@@ -45,6 +45,7 @@ import java.util.logging.Logger;
 
 import jenkins.model.FingerprintFacet;
 import jenkins.model.Jenkins;
+import jnr.ffi.annotations.In;
 import org.json.JSONArray;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 
@@ -83,6 +84,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
      * Saves the given fingerprint inside the PostgreSQL instance.
      */
     public synchronized void save(@NonNull Fingerprint fingerprint) throws IOException {
+
         try (Connection connection = getConnection(this)) {
             connection.setAutoCommit(false);
 
@@ -231,23 +233,41 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
 
     @Override
     public void iterateAndCleanupFingerprints(TaskListener taskListener) {
-        try (Connection connection = getConnection(this);
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                     Queries.getQuery(Queries.SELECT_ALL_USAGES_IN_INSTANCE))) {
-            preparedStatement.setString(1, instanceId);
-            preparedStatement.setString(2, instanceId);
-            try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                if (resultSet.next()) {
-                    System.out.println(resultSet.getString("usages"));
-                    System.out.println(resultSet.getString("original_usages"));
+        try (Connection connection = getConnection(this)) {
+            JSONArray usages = null;
+
+            // clean up the usages
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery(Queries.SELECT_ALL_USAGES_IN_INSTANCE))) {
+                preparedStatement.setString(1, instanceId);
+                preparedStatement.setString(2, instanceId);
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    if (resultSet.next()) {
+                        usages = new JSONArray(resultSet.getString("usages"));
+                    }
                 }
+            }
+            if (usages != null) {
+                cleanUpUsages(connection, usages);
+            }
+
+            // clean up fingerprints
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery(Queries.SELECT_ALL_USAGES_IN_INSTANCE))) {
+
+            }
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery(Queries.VACUUM))) {
+                preparedStatement.executeUpdate();
             }
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Failed cleaning up fingerprints, unable to connect to PostgreSQL.", e);
         }
+
     }
 
-    public void update (Connection connection, JSONArray usages) {
+    private void cleanUpUsages (Connection connection, JSONArray usages) throws SQLException{
         for (int i = 0; i < usages.length(); i++) {
             JSONObject usage = usages.getJSONObject(i);
             String job = usage.getString("job");
@@ -255,9 +275,12 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             for (String field : usage.getString("job").split(","))
                 jobBuildNumbers.add(Integer.parseInt(field));
 
-            Job jobInJenkins = Jenkins.get().getItemByFullName(job, Job.class);
-            if (jobInJenkins == null) {
-                // delete this job everywhere
+            if (Jenkins.get().getItemByFullName(job, Job.class) == null) {
+                try (PreparedStatement preparedStatement = connection.prepareStatement(
+                        Queries.getQuery(Queries.DELETE_JOB_FROM_FINGERPRINT_JOB_BUILD_RELATION))) {
+                    preparedStatement.setString(1, job);
+                    preparedStatement.executeUpdate();
+                }
                 continue;
             }
 
@@ -267,6 +290,15 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 if (new Fingerprint.BuildPtr(job, buildNumber).getRun() == null) {
                     jobsToRemove.add(buildNumber);
                 }
+            }
+
+            // delete the builds
+
+            try (PreparedStatement preparedStatement = connection.prepareStatement(
+                    Queries.getQuery(Queries.VACUUM))) {
+                final java.sql.Array sqlArray = connection.createArrayOf("int", jobsToRemove);
+                statement.setArray(1, sqlArray);
+                preparedStatement.executeUpdate();
             }
 
 
