@@ -37,16 +37,22 @@ import hudson.Util;
 import java.io.IOException;
 import java.io.ByteArrayInputStream;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.sql.Types;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import jenkins.model.FingerprintFacet;
 import org.json.JSONArray;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
 
+import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
 
@@ -122,23 +128,23 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 }
             }
 
-            Map<String, List<String>> facets = DataConversion.extractFacets(fingerprint);
-            for (Map.Entry<String, List<String>> entry : facets.entrySet()) {
-                String facetName = entry.getKey();
-                List<String> facetEntries = entry.getValue();
+            for (FingerprintFacet fingerprintFacet : fingerprint.getPersistedFacets()) {
+                JSONObject fingerprintFacetJSON = new JSONObject(XStreamHandler.getXStream().toXML(fingerprintFacet));
+                String fingerprintFacetName = fingerprintFacetJSON.keys().next();
+                String fingerprintFacetEntry = fingerprintFacetJSON.getJSONObject(fingerprintFacetName).toString();
 
-                for (String facetEntry : facetEntries) {
-                    try (PreparedStatement preparedStatement = connection.prepareStatement(
-                            Queries.getQuery(Queries.INSERT_FINGERPRINT_FACET_RELATION))) {
-                        preparedStatement.setString(1, fingerprint.getHashString());
-                        preparedStatement.setString(2, instanceId);
-                        preparedStatement.setString(3, facetName);
-                        preparedStatement.setString(4, facetEntry);
+                try (PreparedStatement preparedStatement = connection.prepareStatement(
+                        Queries.getQuery(Queries.INSERT_FINGERPRINT_FACET_RELATION))) {
+                    preparedStatement.setString(1, fingerprint.getHashString());
+                    preparedStatement.setString(2, instanceId);
+                    preparedStatement.setString(3, fingerprintFacetName);
+                    preparedStatement.setString(4, fingerprintFacetEntry);
+                    preparedStatement.setBoolean(5, fingerprintFacet.isFingerprintDeletionBlocked());
 
-                        preparedStatement.executeUpdate();
-                    }
+                    preparedStatement.executeUpdate();
                 }
             }
+
             connection.commit();
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "PostgreSQL failed in saving fingerprint: " + fingerprint.toString(), e);
