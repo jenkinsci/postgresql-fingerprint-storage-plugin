@@ -109,4 +109,23 @@ public class PostgreSQLSchemaInitializationTest {
         assertThat(fingerprintLoaded.toString(), is(Matchers.equalTo(fingerprintSaved.toString())));
     }
 
+    @Test
+    public void testSchemaIntializationTwice() throws Exception {
+        PostgreSQLFingerprintStorage postgreSQLFingerprintStorage = PostgreSQLFingerprintStorage.get();
+        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
+
+        String id = Util.getDigestOf("testSchemaIntializationDoesNotDeleteData");
+        Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
+        fingerprintSaved.add(id, 3);
+        fingerprintSaved.getPersistedFacets().add(new PostgreSQLFingerprintStorageTest.TestFacet(
+                fingerprintSaved, 3, id));
+
+        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
+        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
+
+        Fingerprint fingerprintLoaded = Fingerprint.load(id);
+        assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));
+        assertThat(fingerprintLoaded.toString(), is(Matchers.equalTo(fingerprintSaved.toString())));
+    }
+
 }
