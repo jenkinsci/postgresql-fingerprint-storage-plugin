@@ -74,7 +74,8 @@ image::docs/images/config_page.png[]
 
 * `Port` - Specify the port on which PostgreSQL is running
 
-* `Database Name` - Database name has to be specified here.
+* `Database Name` - Specify the database name inside the PostgreSQL instance to be used.
+Please note that the database will not be created by the plugin, the user has to create the database.
 
 * `SSL` - Click if SSL is enabled
 
