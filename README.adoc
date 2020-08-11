@@ -9,7 +9,7 @@ image:https://img.shields.io/github/contributors/jenkinsci/postgresql-fingerprin
 link:https://gitter.im/jenkinsci/external-fingerprint-storage[
 image:https://badges.gitter.im/jenkinsci/external-fingerprint-storage.svg[Gitter]]
 
-image::images/logo.png[]
+image::docs/images/logo.png[]
 
 == Introduction
 
@@ -66,7 +66,7 @@ details:
 
 +
 
-image::images/config_page.png[]
+image::docs/images/config_page.png[]
 
 +
 
