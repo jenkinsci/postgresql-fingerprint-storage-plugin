@@ -195,17 +195,17 @@ public class PostgreSQLConnectionTest {
         Fingerprint.delete(id);
     }
 
-    @Test
-    public void testSlowPostgreSQLConnectionForIsReady() throws IOException {
-        exceptionRule.expect(IOException.class);
-        exceptionRule.expectMessage(CONNECTION_ATTEMPT_FAILED);
-
-        final ToxiproxyContainer.ContainerProxy proxy = toxiproxy.getProxy(postgres, PORT);
-        proxy.toxics().latency("latency", ToxicDirection.DOWNSTREAM,
-                10 + (1000 * PostgreSQLConfiguration.DEFAULT_CONNECTION_TIMEOUT));
-        setConfigurationViaProxy(proxy);
-
-        PostgreSQLFingerprintStorage.get().isReady();
-    }
+//    @Test
+//    public void testSlowPostgreSQLConnectionForIsReady() throws IOException {
+//        exceptionRule.expect(IOException.class);
+//        exceptionRule.expectMessage(CONNECTION_ATTEMPT_FAILED);
+//
+//        final ToxiproxyContainer.ContainerProxy proxy = toxiproxy.getProxy(postgres, PORT);
+//        proxy.toxics().latency("latency", ToxicDirection.DOWNSTREAM,
+//                10 + (1000 * PostgreSQLConfiguration.DEFAULT_CONNECTION_TIMEOUT));
+//        setConfigurationViaProxy(proxy);
+//
+//        PostgreSQLFingerprintStorage.get().isReady();
+//    }
 
 }

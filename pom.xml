@@ -56,11 +56,6 @@ THE SOFTWARE.
 
     <dependencies>
         <dependency>
-            <groupId>com.thoughtworks.xstream</groupId>
-            <artifactId>xstream</artifactId>
-            <version>1.4.12</version>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>1.7.30</version>
@@ -153,23 +148,6 @@ THE SOFTWARE.
         <url>https://github.com/jenkinsci/${project.artifactId}-plugin</url>
     </scm>
     -->
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.jenkins-ci.tools</groupId>
-                <artifactId>maven-hpi-plugin</artifactId>
-                <configuration>
-                    <maskClasses>
-                        com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver
-                        com.thoughtworks.xstream.io.json.JettisonStaxWriter
-                    </maskClasses>
-                    <minimumJavaVersion>8</minimumJavaVersion>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-
     <repositories>
         <repository>
             <id>repo.jenkins-ci.org</id>
