@@ -26,18 +26,22 @@ package io.jenkins.plugins.postgresql;
 import eu.rekawek.toxiproxy.model.ToxicDirection;
 import hudson.Util;
 import hudson.model.Fingerprint;
+import jenkins.telemetry.Telemetry;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.LoggerRule;
 import org.testcontainers.containers.Network;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.containers.ToxiproxyContainer;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
 import static junit.framework.TestCase.fail;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -66,6 +70,9 @@ public class PostgreSQLConnectionTest {
     public ToxiproxyContainer toxiproxy = new ToxiproxyContainer()
             .withNetwork(network)
             .withNetworkAliases("toxiproxy");
+
+    @Rule
+    public LoggerRule logger = new LoggerRule().record(PostgreSQLFingerprintStorage.class, Level.ALL).capture(100);
 
     private void setConfigurationViaProxy(ToxiproxyContainer.ContainerProxy proxy) throws IOException {
         final String host = proxy.getContainerIpAddress();
@@ -135,23 +142,16 @@ public class PostgreSQLConnectionTest {
         fail("Expected IOException");
     }
 
-//    @Test
-//    public void testPostgreSQLConnectionFailureForIsReady() throws IOException {
-//        final ToxiproxyContainer.ContainerProxy proxy = toxiproxy.getProxy(postgres, PORT);
-//        setConfigurationViaProxy(proxy);
-//
-//        proxy.setConnectionCut(true);
-//
-//        PostgreSQLFingerprintStorage.get().isReady();
-//        } catch (IOException e) {
-//            assertThat(e.getMessage(), containsString(CONNECTION_ATTEMPT_FAILED));
-//
-//            proxy.setConnectionCut(false);
-//            assertThat(PostgreSQLFingerprintStorage.get().isReady(), is(false));
-//            return;
-//        }
-//        fail("Expected IOException");
-//    }
+    @Test
+    public void testPostgreSQLConnectionFailureForIsReady() throws IOException {
+        final ToxiproxyContainer.ContainerProxy proxy = toxiproxy.getProxy(postgres, PORT);
+        setConfigurationViaProxy(proxy);
+
+        proxy.setConnectionCut(true);
+
+        assertThat(PostgreSQLFingerprintStorage.get().isReady(), is(false));
+        assertThat(logger.getMessages(), hasItem("Failed connecting to PostgreSQL."));
+    }
 
     @Test
     public void testSlowPostgreSQLConnectionForSave() throws IOException {
@@ -195,17 +195,15 @@ public class PostgreSQLConnectionTest {
         Fingerprint.delete(id);
     }
 
-//    @Test
-//    public void testSlowPostgreSQLConnectionForIsReady() throws IOException {
-//        exceptionRule.expect(IOException.class);
-//        exceptionRule.expectMessage(CONNECTION_ATTEMPT_FAILED);
-//
-//        final ToxiproxyContainer.ContainerProxy proxy = toxiproxy.getProxy(postgres, PORT);
-//        proxy.toxics().latency("latency", ToxicDirection.DOWNSTREAM,
-//                10 + (1000 * PostgreSQLConfiguration.DEFAULT_CONNECTION_TIMEOUT));
-//        setConfigurationViaProxy(proxy);
-//
-//        PostgreSQLFingerprintStorage.get().isReady();
-//    }
+    @Test
+    public void testSlowPostgreSQLConnectionForIsReady() throws IOException {
+        final ToxiproxyContainer.ContainerProxy proxy = toxiproxy.getProxy(postgres, PORT);
+        proxy.toxics().latency("latency", ToxicDirection.DOWNSTREAM,
+                10 + (1000 * PostgreSQLConfiguration.DEFAULT_CONNECTION_TIMEOUT));
+        setConfigurationViaProxy(proxy);
+
+        PostgreSQLFingerprintStorage.get().isReady();
+        assertThat(logger.getMessages(), hasItem("Failed connecting to PostgreSQL."));
+    }
 
 }

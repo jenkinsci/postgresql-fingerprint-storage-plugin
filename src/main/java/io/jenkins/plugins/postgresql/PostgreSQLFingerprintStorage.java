@@ -217,7 +217,6 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                 if (resultSet.next()) {
                     return (resultSet.getInt(ColumnName.TOTAL) > 0);
                 }
-                return false;
             }
         } catch (SQLException e) {
             LOGGER.log(Level.WARNING, "Failed connecting to PostgreSQL.", e);
