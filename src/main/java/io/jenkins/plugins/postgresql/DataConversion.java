@@ -76,8 +76,6 @@ public class DataConversion {
 
     static final String EMPTY_STRING = "";
 
-    private static final String UNRECOGNIZED_JSON_STRUCTURE = "Unrecognized JSON Structure";
-
     /**
      * Constructs the JSON for fingerprint from the given metadata about the fingerprint fetched from
      * PostgreSQL.
@@ -214,49 +212,6 @@ public class DataConversion {
 
         facetsArray.put(facetsObject);
         return facetsArray;
-    }
-
-    /**
-     * Extracts the given fingerprint's facets in the form of JSON Strings.
-     */
-    static @NonNull Map<String, List<String>> extractFacets(@NonNull Fingerprint fingerprint) throws SQLException {
-        Map<String, List<String>> facetsMap = new HashMap<>();
-
-        JSONObject fingerprintJSON = new JSONObject(XStreamHandler.getXStream().toXML(fingerprint))
-                .getJSONObject(FINGERPRINT);
-
-        JSONArray facetsJSON = fingerprintJSON.getJSONArray(FACETS);
-
-        if (facetsJSON.get(0).equals(EMPTY_STRING)) {
-            return Collections.emptyMap();
-        }
-
-        for (int i = 0; i < facetsJSON.length(); i++) {
-            JSONObject facet = facetsJSON.getJSONObject(i);
-
-            for (String facetName : facet.keySet()) {
-                List<String> facetEntriesList = new ArrayList<>();
-                Object facetEntryObject = facet.get(facetName);
-
-                if (facetEntryObject instanceof JSONObject) {
-                    JSONObject facetEntry = (JSONObject) facetEntryObject;
-                    facetEntriesList.add(facetEntry.toString());
-                } else if (facetEntryObject instanceof JSONArray) {
-                    JSONArray facetEntries = (JSONArray) facetEntryObject;
-
-                    for (int j = 0; j < facetEntries.length(); j++) {
-                        JSONObject facetEntry = facetEntries.getJSONObject(j);
-                        facetEntriesList.add(facetEntry.toString());
-                    }
-                } else {
-                    throw new SQLException(UNRECOGNIZED_JSON_STRUCTURE);
-                }
-
-                facetsMap.put(facetName, Collections.unmodifiableList(facetEntriesList));
-            }
-        }
-
-        return Collections.unmodifiableMap(facetsMap);
     }
 
 }
