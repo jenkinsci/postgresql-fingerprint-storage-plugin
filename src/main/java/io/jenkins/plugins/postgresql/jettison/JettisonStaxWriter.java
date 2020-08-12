@@ -17,6 +17,8 @@ import com.thoughtworks.xstream.io.xml.XmlFriendlyReplacer;
 
 import org.codehaus.jettison.AbstractXMLStreamWriter;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
@@ -32,6 +34,7 @@ import java.util.Map;
  * @author J&ouml;rg Schaible
  * @since 1.3.1
  */
+@Restricted(NoExternalUse.class)
 public class JettisonStaxWriter extends StaxWriter {
 
     private final MappedNamespaceConvention convention;

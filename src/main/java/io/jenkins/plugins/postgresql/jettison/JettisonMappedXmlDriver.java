@@ -22,6 +22,8 @@ import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLInputFactory;
 import org.codehaus.jettison.mapped.MappedXMLOutputFactory;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 import javax.xml.stream.XMLStreamException;
 
@@ -41,6 +43,7 @@ import java.net.URL;
  *
  * @author Dejan Bosanac
  */
+@Restricted(NoExternalUse.class)
 public class JettisonMappedXmlDriver extends AbstractDriver {
 
     protected final MappedXMLOutputFactory mof;
