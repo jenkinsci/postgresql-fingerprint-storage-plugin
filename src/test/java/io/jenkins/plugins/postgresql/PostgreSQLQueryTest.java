@@ -49,7 +49,7 @@ public class PostgreSQLQueryTest {
     private static final String FINGERPRINT_FILENAME = "foo.jar";
     private static final String FINGERPRINT_ID = Util.getDigestOf("id");
     private static final String JOB_NAME = "Random Job";
-    private static final int BUILD = 3;
+    private static final int BUILD_NUMBER = 3;
 
     @Rule
     public PostgreSQLContainer postgres = new PostgreSQLContainer();
@@ -181,7 +181,7 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setTimestamp(3, TIMESTAMP);
                 preparedStatement.setString(4, FINGERPRINT_FILENAME);
                 preparedStatement.setString(5, JOB_NAME);
-                preparedStatement.setInt(6, BUILD);
+                preparedStatement.setInt(6, BUILD_NUMBER);
                 preparedStatement.executeUpdate();
             }
 
@@ -194,7 +194,7 @@ public class PostgreSQLQueryTest {
                 assertThat(resultSet.getTimestamp(ColumnName.TIMESTAMP), is(TIMESTAMP));
                 assertThat(resultSet.getString(ColumnName.FILENAME), is(FINGERPRINT_FILENAME));
                 assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_NAME), is(JOB_NAME));
-                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD), is(Integer.toString(BUILD)));
+                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD_NUMBER), is(Integer.toString(BUILD_NUMBER)));
                 assertThat(resultSet.getString(ColumnName.USAGES), is(nullValue()));
                 assertThat(resultSet.getString(ColumnName.FACETS), is(nullValue()));
             }
@@ -231,7 +231,7 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setTimestamp(3, TIMESTAMP);
                 preparedStatement.setString(4, FINGERPRINT_FILENAME);
                 preparedStatement.setString(5, JOB_NAME);
-                preparedStatement.setInt(6, BUILD);
+                preparedStatement.setInt(6, BUILD_NUMBER);
                 preparedStatement.executeUpdate();
             }
 
@@ -240,7 +240,7 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setString(3, JOB_NAME);
-                preparedStatement.setInt(4, BUILD);
+                preparedStatement.setInt(4, BUILD_NUMBER);
                 preparedStatement.executeUpdate();
             }
 
@@ -253,9 +253,9 @@ public class PostgreSQLQueryTest {
                 assertThat(resultSet.getTimestamp(ColumnName.TIMESTAMP), is(TIMESTAMP));
                 assertThat(resultSet.getString(ColumnName.FILENAME), is(FINGERPRINT_FILENAME));
                 assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_NAME), is(JOB_NAME));
-                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD), is(Integer.toString(BUILD)));
+                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD_NUMBER), is(Integer.toString(BUILD_NUMBER)));
                 assertThat(resultSet.getString(ColumnName.USAGES), is(equalTo("[{\"job\" : \"" + JOB_NAME + "\", " +
-                        "\"build\" : " + BUILD + "}]")));
+                        "\"build_number\" : " + BUILD_NUMBER + "}]")));
                 assertThat(resultSet.getString(ColumnName.FACETS), is(nullValue()));;
             }
         }
@@ -291,7 +291,7 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setTimestamp(3, TIMESTAMP);
                 preparedStatement.setString(4, FINGERPRINT_FILENAME);
                 preparedStatement.setString(5, JOB_NAME);
-                preparedStatement.setInt(6, BUILD);
+                preparedStatement.setInt(6, BUILD_NUMBER);
                 preparedStatement.executeUpdate();
             }
 
@@ -318,7 +318,7 @@ public class PostgreSQLQueryTest {
                 assertThat(resultSet.getTimestamp(ColumnName.TIMESTAMP), is(TIMESTAMP));
                 assertThat(resultSet.getString(ColumnName.FILENAME), is(FINGERPRINT_FILENAME));
                 assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_NAME), is(JOB_NAME));
-                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD), is(Integer.toString(BUILD)));
+                assertThat(resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD_NUMBER), is(Integer.toString(BUILD_NUMBER)));
                 assertThat(resultSet.getString(ColumnName.USAGES), is(nullValue()));
                 assertThat(resultSet.getString(ColumnName.FACETS), is(equalTo("[{\"facet_name\" : \"FingerprintFacet\", " +
                         "\"facet_entry\" : {\"foo\": \"bar\"}}]")));
@@ -356,7 +356,7 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setTimestamp(3, TIMESTAMP);
                 preparedStatement.setString(4, FINGERPRINT_FILENAME);
                 preparedStatement.setString(5, JOB_NAME);
-                preparedStatement.setInt(6, BUILD);
+                preparedStatement.setInt(6, BUILD_NUMBER);
                 preparedStatement.executeUpdate();
             }
 
@@ -365,7 +365,7 @@ public class PostgreSQLQueryTest {
                 preparedStatement.setString(1, FINGERPRINT_ID);
                 preparedStatement.setString(2, INSTANCE_ID);
                 preparedStatement.setString(3, JOB_NAME);
-                preparedStatement.setInt(4, BUILD);
+                preparedStatement.setInt(4, BUILD_NUMBER);
                 preparedStatement.executeUpdate();
             }
 
