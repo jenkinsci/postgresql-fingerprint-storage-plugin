@@ -154,8 +154,6 @@ public class PostgreSQLFingerprintStorageTest {
         fingerprintSaved.add("b", 33);
         fingerprintSaved.add("c", 333);
 
-        System.out.println(XStreamHandler.getXStream().toXML(fingerprintSaved));
-
         Fingerprint fingerprintLoaded = Fingerprint.load(id);
         assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));
         assertThat(fingerprintLoaded.toString(), is(Matchers.equalTo(fingerprintSaved.toString())));
