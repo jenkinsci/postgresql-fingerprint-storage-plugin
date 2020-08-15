@@ -27,7 +27,6 @@ import com.thoughtworks.xstream.converters.basic.DateConverter;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Fingerprint;
-import jenkins.fingerprints.FileFingerprintStorage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.kohsuke.accmod.Restricted;
@@ -43,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
+
 
 /**
  * Helper class for handling converting of data from and to different data structures.
@@ -112,7 +112,7 @@ public class DataConversion {
             for (Map.Entry<String, Fingerprint.RangeSet> usage : usageMetadata.entrySet()) {
                 JSONObject jobAndBuildNumber = new JSONObject();
                 jobAndBuildNumber.put(STRING, usage.getKey());
-                jobAndBuildNumber.put(RANGES, FileFingerprintStorage.serialize(usage.getValue()));
+                jobAndBuildNumber.put(RANGES, Fingerprint.RangeSet.ConverterImpl.serialize(usage.getValue()));
 
                 entryArray.put(jobAndBuildNumber);
             }

@@ -38,7 +38,7 @@ THE SOFTWARE.
     <packaging>hpi</packaging>
 
     <properties>
-        <jenkins.version>2.252-rc30307.f1682ce787a2</jenkins.version>
+        <jenkins.version>2.252-rc30322.25ff27ef52ac</jenkins.version>
         <java.level>8</java.level>
         <useBeta>true</useBeta>
         <configuration-as-code.version>1.43</configuration-as-code.version>
@@ -51,6 +51,11 @@ THE SOFTWARE.
         <license>
             <name>MIT License</name>
             <url>http://opensource.org/licenses/MIT</url>
+        </license>
+        <license>
+            <name>BSD style</name>
+            <url>http://xstream.codehaus.org/license.html</url>
+            <distribution>repo</distribution>
         </license>
     </licenses>
 
