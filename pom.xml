@@ -114,7 +114,7 @@ THE SOFTWARE.
         <dependency>
             <groupId>org.jenkins-ci.main</groupId>
             <artifactId>jenkins-test-harness</artifactId>
-            <version>1692.v0a_3884e172a_4</version>
+            <version>1698.vc58b_4e102e41</version>
             <scope>test</scope>
         </dependency>
         <dependency>
