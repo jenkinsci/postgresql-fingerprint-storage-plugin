@@ -26,7 +26,6 @@ package io.jenkins.plugins.postgresql;
 import eu.rekawek.toxiproxy.model.ToxicDirection;
 import hudson.Util;
 import hudson.model.Fingerprint;
-import jenkins.telemetry.Telemetry;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -62,7 +61,7 @@ public class PostgreSQLConnectionTest {
     public Network network = Network.newNetwork();
 
     @Rule
-    public PostgreSQLContainer postgres = (PostgreSQLContainer) new PostgreSQLContainer()
+    public PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE)
             .withExposedPorts(PORT)
             .withNetwork(network);
 
