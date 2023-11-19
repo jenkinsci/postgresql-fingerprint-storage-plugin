@@ -86,6 +86,7 @@ public class JettisonStaxWriter extends StaxWriter {
      *             {@link JettisonStaxWriter#JettisonStaxWriter(QNameMap, XMLStreamWriter, boolean, boolean, NameCoder, MappedNamespaceConvention)}
      *             instead
      */
+    @Deprecated
     public JettisonStaxWriter(
             QNameMap qnameMap, XMLStreamWriter out, boolean writeEnclosingDocument,
             boolean namespaceRepairingMode, XmlFriendlyReplacer replacer,
