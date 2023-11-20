@@ -1,0 +1,20 @@
+version: "3.9"
+services:
+  postgresql:
+    image: bitnami/postgresql:16.1.0
+    container_name: postgresql
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+      - ALLOW_EMPTY_PASSWORD=true
+      - POSTGRESQL_DATABASE=jenkins
+    volumes:
+      - postgresql:/bitnami/postgresql
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+    
+volumes:
+  postgresql: {}

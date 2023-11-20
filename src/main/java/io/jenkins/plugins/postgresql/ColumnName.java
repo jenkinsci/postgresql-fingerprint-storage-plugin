@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2020, Jenkins project contributors
+ * Copyright (c) 2023, Jenkins project contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -36,5 +36,4 @@ public class ColumnName {
     static final String FACETS = "facets";
     static final String TOTAL = "total";
     static final String EXISTS = "exists";
-
 }

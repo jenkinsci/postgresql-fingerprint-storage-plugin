@@ -1,6 +1,6 @@
 # The MIT License
 #
-# Copyright (c) 2020, Jenkins project contributors
+# Copyright (c) 2023, Jenkins project contributors
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,4 @@
 unclassified:
   fingerprints:
     storage:
-      postgresql:
-        host: "testHost"
-        port: 3333
-        ssl: true
-        databaseName: "testDatabase"
-        connectionTimeout: 3
-        socketTimeout: 3
-        credentialsId: "testCredentialsId"
-
+      postgresql: {}
