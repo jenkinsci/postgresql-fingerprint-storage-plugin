@@ -1,7 +1,7 @@
 = PostgreSQL Fingerprint Storage Plugin
 
-link:https://ci.jenkins.io/job/Plugins/job/postgresql-fingerprint-storage-plugin/job/master/[
-image:https://ci.jenkins.io/job/Plugins/job/postgresql-fingerprint-storage-plugin/job/master/badge/icon[Build]]
+link:https://ci.jenkins.io/job/Plugins/job/postgresql-fingerprint-storage-plugin/job/main/[
+image:https://ci.jenkins.io/job/Plugins/job/postgresql-fingerprint-storage-plugin/job/main/badge/icon[Build]]
 link:https://lgtm.com/projects/g/jenkinsci/postgresql-fingerprint-storage-plugin/context:java[
 image:https://img.shields.io/lgtm/grade/java/g/jenkinsci/postgresql-fingerprint-storage-plugin.svg?logo=lgtm&logoWidth=18[Language grade: Java]]
 link:https://github.com/jenkinsci/postgresql-fingerprint-storage-plugin/graphs/contributors[
