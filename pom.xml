@@ -68,6 +68,11 @@ THE SOFTWARE.
             <scope>import</scope>
             <type>pom</type>
           </dependency>
+          <dependency>
+            <groupId>org.codehaus.jettison</groupId>
+            <artifactId>jettison</artifactId>
+            <version>1.5.4</version>
+          </dependency>
         </dependencies>
       </dependencyManagement>
     <dependencies>
@@ -84,14 +89,12 @@ THE SOFTWARE.
             <artifactId>postgresql-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>javax.json</groupId>
-            <artifactId>javax.json-api</artifactId>
-            <version>1.1.4</version>
+            <groupId>org.jenkins-ci.plugins</groupId>
+            <artifactId>jackson2-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.codehaus.jettison</groupId>
-            <artifactId>jettison</artifactId>
-            <version>1.5.4</version>
+            <groupId>io.jenkins.plugins</groupId>
+            <artifactId>jersey2-api</artifactId>
         </dependency>
 
         <!-- Test dependencies -->
@@ -112,11 +115,6 @@ THE SOFTWARE.
             <artifactId>toxiproxy</artifactId>
             <version>1.19.2</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.json</groupId>
-            <artifactId>json</artifactId>
-            <version>20231013</version>
         </dependency>
         <dependency>
             <groupId>io.jenkins</groupId>
