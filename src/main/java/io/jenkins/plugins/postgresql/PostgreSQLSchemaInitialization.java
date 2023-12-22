@@ -26,7 +26,6 @@ package io.jenkins.plugins.postgresql;
 import io.jenkins.plugins.postgresql.PostgreSQLFingerprintStorage.ConnectionSupplier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -51,26 +50,6 @@ public class PostgreSQLSchemaInitialization {
     static synchronized void performSchemaInitialization(ConnectionSupplier connectionSupplier) {
         try (Connection connection = connectionSupplier.connection()) {
             connection.setAutoCommit(false);
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CHECK_SCHEMA_EXISTS))) {
-                ResultSet resultSet = preparedStatement.executeQuery();
-                boolean schemaExists = false;
-                if (resultSet.next()) {
-                    schemaExists = (resultSet.getInt(ColumnName.TOTAL) == 1);
-                }
-                resultSet.close();
-                if (schemaExists) {
-                    return;
-                }
-            }
-
-            // Create schema
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
-                preparedStatement.execute();
-            }
 
             // Create fingerprint table
 

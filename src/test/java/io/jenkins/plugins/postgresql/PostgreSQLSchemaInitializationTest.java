@@ -75,13 +75,6 @@ public class PostgreSQLSchemaInitializationTest {
                 postgreSQLFingerprintStorage.getConnectionSupplier().connection()) {
 
             try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CHECK_SCHEMA_EXISTS))) {
-                ResultSet resultSet = preparedStatement.executeQuery();
-                assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getInt(ColumnName.TOTAL), is(1));
-            }
-
-            try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.CHECK_FINGERPRINT_TABLE_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));

@@ -84,7 +84,7 @@ public class JobsIntegrationTest {
         assertThat(build.getResult(), is(Result.SUCCESS));
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement =
-                    connection.prepareStatement("SELECT COUNT(*) FROM FINGERPRINT.FINGERPRINT")) {
+                    connection.prepareStatement("SELECT COUNT(*) FROM FINGERPRINT")) {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
                         assertThat(resultSet.getInt(1), is(1));
@@ -107,7 +107,7 @@ public class JobsIntegrationTest {
 
         try (Connection connection = getConnection()) {
             try (PreparedStatement preparedStatement =
-                    connection.prepareStatement("SELECT COUNT(*) FROM FINGERPRINT.FINGERPRINT")) {
+                    connection.prepareStatement("SELECT COUNT(*) FROM FINGERPRINT")) {
                 try (ResultSet resultSet = preparedStatement.executeQuery()) {
                     if (resultSet.next()) {
                         assertThat(resultSet.getInt(1), is(1));

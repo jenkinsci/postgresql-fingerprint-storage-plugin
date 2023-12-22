@@ -62,29 +62,8 @@ public class PostgreSQLQueryTest {
     }
 
     @Test
-    public void testCreateFingerprintSchema() throws SQLException {
-        try (Connection connection = getConnection()) {
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CHECK_SCHEMA_EXISTS))) {
-                ResultSet resultSet = preparedStatement.executeQuery();
-                assertThat(resultSet.next(), is(true));
-                assertThat(resultSet.getInt(ColumnName.TOTAL), is(1));
-            }
-        }
-    }
-
-    @Test
     public void testCreateFingerprintTable() throws SQLException {
         try (Connection connection = getConnection()) {
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
-                preparedStatement.execute();
-            }
 
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
@@ -103,10 +82,6 @@ public class PostgreSQLQueryTest {
     @Test
     public void testCreateFingerprintJobBuildRelationTable() throws SQLException {
         try (Connection connection = getConnection()) {
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
-                preparedStatement.execute();
-            }
 
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
@@ -130,10 +105,6 @@ public class PostgreSQLQueryTest {
     @Test
     public void testCreateFingerprintFacetRelationTable() throws SQLException {
         try (Connection connection = getConnection()) {
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
-                preparedStatement.execute();
-            }
 
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
@@ -157,10 +128,6 @@ public class PostgreSQLQueryTest {
     @Test
     public void testInsertAndSelectFingerprint() throws SQLException {
         try (Connection connection = getConnection()) {
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
-                preparedStatement.execute();
-            }
 
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
@@ -208,10 +175,6 @@ public class PostgreSQLQueryTest {
     @Test
     public void testInsertAndSelectFingerprintJobBuildRelation() throws SQLException {
         try (Connection connection = getConnection()) {
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
-                preparedStatement.execute();
-            }
 
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
@@ -272,10 +235,6 @@ public class PostgreSQLQueryTest {
     @Test
     public void testInsertAndSelectFingerprintFacetRelation() throws SQLException {
         try (Connection connection = getConnection()) {
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
-                preparedStatement.execute();
-            }
 
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
@@ -340,10 +299,6 @@ public class PostgreSQLQueryTest {
     @Test
     public void testDeleteFingerprint() throws SQLException {
         try (Connection connection = getConnection()) {
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
-                preparedStatement.execute();
-            }
 
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
