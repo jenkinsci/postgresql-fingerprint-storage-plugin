@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2020, Jenkins project contributors
+ * Copyright (c) 2023, Jenkins project contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,42 +23,22 @@
  */
 package io.jenkins.plugins.postgresql;
 
-import com.cloudbees.plugins.credentials.CredentialsMatchers;
-import com.cloudbees.plugins.credentials.CredentialsProvider;
-import com.cloudbees.plugins.credentials.common.StandardListBoxModel;
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.model.Item;
-import hudson.security.ACL;
 import hudson.util.FormValidation;
-import hudson.util.ListBoxModel;
+import jenkins.fingerprints.FingerprintStorage;
 import jenkins.fingerprints.FingerprintStorageDescriptor;
 import jenkins.model.Jenkins;
-import org.apache.commons.lang.StringUtils;
+import org.jenkinsci.plugins.database.Database;
+import org.jenkinsci.plugins.database.GlobalDatabaseConfiguration;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-import org.kohsuke.stapler.AncestorInPath;
-import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.interceptor.RequirePOST;
-
-import javax.servlet.ServletException;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.Collections;
 
 /**
  * Descriptor class for {@link PostgreSQLFingerprintStorage}.
  */
 @Restricted(NoExternalUse.class)
 public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDescriptor {
-
-    public static final String DEFAULT_HOST = "localhost";
-    public static final int DEFAULT_PORT = 5432;
-    public static final String DEFAULT_DATABASE_NAME = "defaultDB";
-    public static final boolean DEFAULT_SSL = false;
-    public static final int DEFAULT_CONNECTION_TIMEOUT = 1;
-    public static final int DEFAULT_SOCKET_TIMEOUT = 1;
-    public static final String DEFAULT_CREDENTIALS_ID = "";
 
     private static final String SUCCESS = "Success";
 
@@ -69,100 +49,25 @@ public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDe
 
     @RequirePOST
     @Restricted(NoExternalUse.class)
-    public ListBoxModel doFillCredentialsIdItems(@AncestorInPath Item item, @QueryParameter String credentialsId) {
-        StandardListBoxModel result = new StandardListBoxModel();
-        if ((item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)) ||
-                (item != null && !item.hasPermission(Item.EXTENDED_READ) &&
-                        !item.hasPermission(CredentialsProvider.USE_ITEM))) {
-            return result.includeCurrentValue(credentialsId);
-        }
-        return result
-                .includeEmptyValue()
-                .includeMatchingAs(
-                        ACL.SYSTEM,
-                        Jenkins.get(),
-                        StandardUsernamePasswordCredentials.class,
-                        Collections.emptyList(),
-                        CredentialsMatchers.always()
-                )
-                .includeCurrentValue(credentialsId);
-    }
-
-    @Restricted(NoExternalUse.class)
-    public FormValidation doCheckCredentialsId(@AncestorInPath Item item, @QueryParameter String value) {
-        if ((item == null && !Jenkins.get().hasPermission(Jenkins.ADMINISTER)) ||
-                (item !=null && !item.hasPermission(Item.EXTENDED_READ) &&
-                        !item.hasPermission(CredentialsProvider.USE_ITEM))) {
-            return FormValidation.ok();
-        }
-        if (StringUtils.isBlank(value)) {
-            return FormValidation.ok();
-        }
-        if (CredentialsProvider.listCredentials(
-                StandardUsernamePasswordCredentials.class,
-                Jenkins.get(),
-                ACL.SYSTEM,
-                Collections.emptyList(),
-                CredentialsMatchers.withId(value)
-        ).isEmpty()) {
-            return FormValidation.error("Cannot find currently selected credentials");
-        }
-        return FormValidation.ok();
-    }
-
-    @RequirePOST
-    @Restricted(NoExternalUse.class)
-    public FormValidation doInitializePostgreSQL(
-            @QueryParameter("host") final String host,
-            @QueryParameter("port") final int port,
-            @QueryParameter("databaseName") final String databaseName,
-            @QueryParameter("ssl") final boolean ssl,
-            @QueryParameter("credentialsId") final String credentialsId,
-            @QueryParameter("connectionTimeout") final int connectionTimeout,
-            @QueryParameter("socketTimeout") final int socketTimeout
-    ) throws IOException, ServletException {
+    public FormValidation doInitializePostgreSQL() {
         if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
             return FormValidation.error("Need admin permission to perform this action");
         }
         try {
-            PostgreSQLSchemaInitialization.performSchemaInitialization(host, port, databaseName, credentialsId, ssl,
-                    connectionTimeout, socketTimeout);
+            FingerprintStorage fingerprintStorage = FingerprintStorage.get();
+            if (fingerprintStorage instanceof PostgreSQLFingerprintStorage) {
+                Database database = GlobalDatabaseConfiguration.get().getDatabase();
+                if (database == null) {
+                    return FormValidation.error("No database configured on global configuration");
+                }
+                PostgreSQLFingerprintStorage postgreSQLFingerprintStorage =
+                        (PostgreSQLFingerprintStorage) fingerprintStorage;
+                PostgreSQLSchemaInitialization.performSchemaInitialization(
+                        postgreSQLFingerprintStorage.getConnectionSupplier());
+            }
             return FormValidation.ok(SUCCESS);
         } catch (Exception e) {
             return FormValidation.error("Schema initialization failed." + e.getMessage());
         }
     }
-
-    @RequirePOST
-    @Restricted(NoExternalUse.class)
-    public FormValidation doTestPostgreSQLConnection(
-            @QueryParameter("host") final String host,
-            @QueryParameter("port") final int port,
-            @QueryParameter("databaseName") final String databaseName,
-            @QueryParameter("ssl") final boolean ssl,
-            @QueryParameter("credentialsId") final String credentialsId,
-            @QueryParameter("connectionTimeout") final int connectionTimeout,
-            @QueryParameter("socketTimeout") final int socketTimeout
-    ) throws IOException, ServletException {
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-            return FormValidation.error("Need admin permission to perform this action");
-        }
-        try {
-            testConnection(host, port, databaseName, credentialsId, ssl, connectionTimeout, socketTimeout);
-            return FormValidation.ok(SUCCESS);
-        } catch (Exception e) {
-            return FormValidation.error("Connection error : " + e.getMessage());
-        }
-    }
-
-    protected void testConnection (String host, int port, String databaseName, String credentialsId, boolean ssl,
-                                   int connectionTimeout, int socketTimeout) throws SQLException {
-        StandardUsernamePasswordCredentials standardUsernamePasswordCredentials =
-                CredentialLookup.getCredential(credentialsId);
-        String username = CredentialLookup.getUsernameFromCredential(standardUsernamePasswordCredentials);
-        String password = CredentialLookup.getPasswordFromCredential(standardUsernamePasswordCredentials);
-        PostgreSQLConnection.getConnection(host, port, databaseName, username, password, ssl, connectionTimeout,
-                socketTimeout);
-    }
-
 }

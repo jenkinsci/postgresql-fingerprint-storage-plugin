@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2020, Jenkins project contributors
+ * Copyright (c) 2023, Jenkins project contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,20 +23,16 @@
  */
 package io.jenkins.plugins.postgresql;
 
-import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.ExtensionList;
-import hudson.model.TaskListener;
-import jenkins.fingerprints.FingerprintStorage;
-import hudson.model.Fingerprint;
 import hudson.Util;
-
-import java.io.IOException;
+import hudson.model.Fingerprint;
+import hudson.model.TaskListener;
 import java.io.ByteArrayInputStream;
-
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -47,14 +43,14 @@ import java.util.Hashtable;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
+import jenkins.fingerprints.FingerprintStorage;
 import jenkins.model.FingerprintFacet;
-import org.json.JSONArray;
 import org.jenkinsci.main.modules.instance_identity.InstanceIdentity;
-
+import org.jenkinsci.plugins.database.Database;
+import org.jenkinsci.plugins.database.GlobalDatabaseConfiguration;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
-import org.kohsuke.stapler.DataBoundSetter;
 
 /**
  * Pluggable external fingerprint storage for fingerprints into PostgreSQL.
@@ -65,36 +61,40 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     private final String instanceId;
     private static final Logger LOGGER = Logger.getLogger(PostgreSQLFingerprintStorage.class.getName());
 
+    private transient ConnectionSupplier connectionSupplier;
+
     public static PostgreSQLFingerprintStorage get() {
         return ExtensionList.lookupSingleton(PostgreSQLFingerprintStorage.class);
     }
 
     @DataBoundConstructor
     public PostgreSQLFingerprintStorage() throws IOException {
-        instanceId = Util.getDigestOf(new ByteArrayInputStream(InstanceIdentity.get().getPublic().getEncoded()));
+        instanceId = Util.getDigestOf(
+                new ByteArrayInputStream(InstanceIdentity.get().getPublic().getEncoded()));
     }
 
-    /**
-     * Creates and returns a connection to the PostgreSQL instance.
-     */
-    @NonNull Connection getConnection(PostgreSQLFingerprintStorage postgreSQLFingerprintStorage) throws SQLException {
-        return PostgreSQLConnection.getConnection(postgreSQLFingerprintStorage);
+    public ConnectionSupplier getConnectionSupplier() {
+        if (connectionSupplier == null) {
+            connectionSupplier = new LocalConnectionSupplier();
+        }
+        return connectionSupplier;
     }
 
     /**
      * Saves the given fingerprint inside the PostgreSQL instance.
      */
     public synchronized void save(@NonNull Fingerprint fingerprint) throws IOException {
-        try (Connection connection = getConnection(this)) {
+        try (Connection connection = getConnectionSupplier().connection()) {
             connection.setAutoCommit(false);
 
             delete(fingerprint.getHashString(), connection);
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.INSERT_FINGERPRINT))) {
+            try (PreparedStatement preparedStatement =
+                    connection.prepareStatement(Queries.getQuery(Queries.INSERT_FINGERPRINT))) {
                 preparedStatement.setString(1, fingerprint.getHashString());
                 preparedStatement.setString(2, instanceId);
-                preparedStatement.setTimestamp(3, new Timestamp(fingerprint.getTimestamp().getTime()));
+                preparedStatement.setTimestamp(
+                        3, new Timestamp(fingerprint.getTimestamp().getTime()));
                 preparedStatement.setString(4, fingerprint.getFileName());
 
                 Fingerprint.BuildPtr original = fingerprint.getOriginal();
@@ -129,12 +129,14 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
             }
 
             for (FingerprintFacet fingerprintFacet : fingerprint.getPersistedFacets()) {
-                JSONObject fingerprintFacetJSON = new JSONObject(XStreamHandler.getXStream().toXML(fingerprintFacet));
+                JSONObject fingerprintFacetJSON =
+                        new JSONObject(XStreamHandler.getXStream().toXML(fingerprintFacet));
                 String fingerprintFacetName = fingerprintFacetJSON.keys().next();
-                String fingerprintFacetEntry = fingerprintFacetJSON.getJSONObject(fingerprintFacetName).toString();
+                String fingerprintFacetEntry =
+                        fingerprintFacetJSON.getJSONObject(fingerprintFacetName).toString();
 
-                try (PreparedStatement preparedStatement = connection.prepareStatement(
-                        Queries.getQuery(Queries.INSERT_FINGERPRINT_FACET_RELATION))) {
+                try (PreparedStatement preparedStatement =
+                        connection.prepareStatement(Queries.getQuery(Queries.INSERT_FINGERPRINT_FACET_RELATION))) {
                     preparedStatement.setString(1, fingerprint.getHashString());
                     preparedStatement.setString(2, instanceId);
                     preparedStatement.setString(3, fingerprintFacetName);
@@ -157,9 +159,9 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
      * instance.
      */
     public @CheckForNull Fingerprint load(@NonNull String id) throws IOException {
-        try (Connection connection = getConnection(this);
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                       Queries.getQuery(Queries.SELECT_FINGERPRINT))) {
+        try (Connection connection = getConnectionSupplier().connection();
+                PreparedStatement preparedStatement =
+                        connection.prepareStatement(Queries.getQuery(Queries.SELECT_FINGERPRINT))) {
 
             preparedStatement.setString(1, id);
             preparedStatement.setString(2, instanceId);
@@ -174,10 +176,9 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
                         resultSet.getTimestamp(ColumnName.TIMESTAMP),
                         resultSet.getString(ColumnName.FILENAME),
                         resultSet.getString(ColumnName.ORIGINAL_JOB_NAME),
-                        resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD_NUMBER)
-                );
-                Map<String, Fingerprint.RangeSet> usageMetadata = DataConversion.extractUsageMetadata(
-                        resultSet.getString(ColumnName.USAGES));
+                        resultSet.getString(ColumnName.ORIGINAL_JOB_BUILD_NUMBER));
+                Map<String, Fingerprint.RangeSet> usageMetadata =
+                        DataConversion.extractUsageMetadata(resultSet.getString(ColumnName.USAGES));
                 JSONArray facets = DataConversion.extractFacets(resultSet.getString(ColumnName.FACETS));
                 String json = DataConversion.constructFingerprintJSON(fingerprintMetadata, usageMetadata, facets);
                 return (Fingerprint) XStreamHandler.getXStream().fromXML(json);
@@ -192,7 +193,7 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
      * Deletes the fingerprint with the given id from the PostgreSQL instance.
      */
     public void delete(@NonNull String id) throws IOException {
-        try (Connection connection = getConnection(this)) {
+        try (Connection connection = getConnectionSupplier().connection()) {
             connection.setAutoCommit(false);
             delete(id, connection);
             connection.commit();
@@ -203,8 +204,8 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
     }
 
     private void delete(@NonNull String id, @NonNull Connection connection) throws SQLException {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(
-                Queries.getQuery(Queries.DELETE_FINGERPRINT))) {
+        try (PreparedStatement preparedStatement =
+                connection.prepareStatement(Queries.getQuery(Queries.DELETE_FINGERPRINT))) {
             preparedStatement.setString(1, id);
             preparedStatement.setString(2, instanceId);
             preparedStatement.executeUpdate();
@@ -215,9 +216,9 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
      * Returns true if there are fingerprints associate with the instance ID inside PostgreSQL instance.
      */
     public boolean isReady() {
-        try (Connection connection = getConnection(this);
-             PreparedStatement preparedStatement = connection.prepareStatement(
-                     Queries.getQuery(Queries.SELECT_FINGERPRINT_EXISTS_FOR_INSTANCE))) {
+        try (Connection connection = getConnectionSupplier().connection();
+                PreparedStatement preparedStatement =
+                        connection.prepareStatement(Queries.getQuery(Queries.SELECT_FINGERPRINT_EXISTS_FOR_INSTANCE))) {
             preparedStatement.setString(1, instanceId);
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 if (resultSet.next()) {
@@ -235,90 +236,44 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
         // TODO
     }
 
-    private String host = PostgreSQLFingerprintStorageDescriptor.DEFAULT_HOST;
-    private int port = PostgreSQLFingerprintStorageDescriptor.DEFAULT_PORT;
-    private String databaseName = PostgreSQLFingerprintStorageDescriptor.DEFAULT_DATABASE_NAME;
-    private boolean ssl = PostgreSQLFingerprintStorageDescriptor.DEFAULT_SSL;
-    private int connectionTimeout = PostgreSQLFingerprintStorageDescriptor.DEFAULT_CONNECTION_TIMEOUT;
-    private int socketTimeout = PostgreSQLFingerprintStorageDescriptor.DEFAULT_SOCKET_TIMEOUT;
-    private String credentialsId = PostgreSQLFingerprintStorageDescriptor.DEFAULT_CREDENTIALS_ID;
-
-    public String getHost() {
-        return host;
+    static class LocalConnectionSupplier extends ConnectionSupplier {
+        @Override
+        protected Database database() {
+            return GlobalDatabaseConfiguration.get().getDatabase();
+        }
     }
 
-    @DataBoundSetter
-    public void setHost(String host) {
-        this.host = host;
-    }
+    abstract static class ConnectionSupplier implements AutoCloseable {
 
-    public int getPort() {
-        return port;
-    }
+        private transient Connection connection;
 
-    @DataBoundSetter
-    public void setPort(int port) {
-        this.port = port;
-    }
+        protected abstract Database database();
 
-    public String getDatabaseName() {
-        return databaseName;
-    }
+        protected void initialize(Connection connection) throws SQLException {}
 
-    @DataBoundSetter
-    public void setDatabaseName(String databaseName) {
-        this.databaseName = databaseName;
-    }
+        @SuppressFBWarnings(value = "IS2_INCONSISTENT_SYNC")
+        synchronized Connection connection() throws SQLException {
+            if (connection == null || connection.isClosed()) {
+                Connection _connection = database().getDataSource().getConnection();
+                initialize(_connection);
+                connection = _connection;
+            }
+            return connection;
+        }
 
-    public boolean getSsl() {
-        return this.ssl;
-    }
-
-    @DataBoundSetter
-    public void setSsl(boolean ssl) {
-        this.ssl = ssl;
-    }
-
-    public int getConnectionTimeout() {
-        return connectionTimeout;
-    }
-
-    @DataBoundSetter
-    public void setConnectionTimeout(int connectionTimeout) {
-        this.connectionTimeout = connectionTimeout;
-    }
-
-    public int getSocketTimeout() {
-        return socketTimeout;
-    }
-
-    @DataBoundSetter
-    public void setSocketTimeout(int socketTimeout) {
-        this.socketTimeout = socketTimeout;
-    }
-
-    public String getCredentialsId() {
-        return credentialsId;
-    }
-
-    @DataBoundSetter
-    public void setCredentialsId(String credentialsId) {
-        this.credentialsId = credentialsId;
-    }
-
-    public @NonNull String getUsername() {
-        StandardUsernamePasswordCredentials credential = CredentialLookup.getCredential(getCredentialsId());
-        return CredentialLookup.getUsernameFromCredential(credential);
-    }
-
-    public @NonNull String getPassword() {
-        StandardUsernamePasswordCredentials credential = CredentialLookup.getCredential(getCredentialsId());
-        return CredentialLookup.getPasswordFromCredential(credential);
+        @Override
+        public void close() {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+            connection = null;
+        }
     }
 
     @Extension
-    public static class DescriptorImpl extends PostgreSQLFingerprintStorageDescriptor {
-
-    }
-
+    public static class DescriptorImpl extends PostgreSQLFingerprintStorageDescriptor {}
 }

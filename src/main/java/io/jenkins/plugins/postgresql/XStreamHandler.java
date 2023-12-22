@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2020, Jenkins project contributors
+ * Copyright (c) 2023, Jenkins project contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,14 +23,13 @@
  */
 package io.jenkins.plugins.postgresql;
 
+import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.converters.collections.CollectionConverter;
 import com.thoughtworks.xstream.io.json.JettisonMappedXmlDriver;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Fingerprint;
 import hudson.util.HexBinaryConverter;
 import hudson.util.XStream2;
-import com.thoughtworks.xstream.XStream;
-
 import java.util.ArrayList;
 
 /**
@@ -53,14 +52,13 @@ public class XStreamHandler {
         XSTREAM.alias(DataConversion.RANGE, Fingerprint.Range.class);
         XSTREAM.alias(DataConversion.RANGES, Fingerprint.RangeSet.class);
         XSTREAM.registerConverter(new HexBinaryConverter(), 10);
-        XSTREAM.registerConverter(new Fingerprint.RangeSet.ConverterImpl(
-                new CollectionConverter(XSTREAM.getMapper()) {
+        XSTREAM.registerConverter(
+                new Fingerprint.RangeSet.ConverterImpl(new CollectionConverter(XSTREAM.getMapper()) {
                     @Override
                     protected Object createCollection(Class type) {
                         return new ArrayList();
                     }
-                }
-        ), 10);
+                }),
+                10);
     }
-
 }

@@ -48,16 +48,6 @@ import com.thoughtworks.xstream.io.StreamException;
 import com.thoughtworks.xstream.io.xml.QNameMap;
 import com.thoughtworks.xstream.io.xml.StaxReader;
 import com.thoughtworks.xstream.io.xml.StaxWriter;
-
-import org.codehaus.jettison.mapped.Configuration;
-import org.codehaus.jettison.mapped.MappedNamespaceConvention;
-import org.codehaus.jettison.mapped.MappedXMLInputFactory;
-import org.codehaus.jettison.mapped.MappedXMLOutputFactory;
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import javax.xml.stream.XMLStreamException;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -66,7 +56,13 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.net.URL;
-
+import javax.xml.stream.XMLStreamException;
+import org.codehaus.jettison.mapped.Configuration;
+import org.codehaus.jettison.mapped.MappedNamespaceConvention;
+import org.codehaus.jettison.mapped.MappedXMLInputFactory;
+import org.codehaus.jettison.mapped.MappedXMLOutputFactory;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 /**
  * Simple XStream driver wrapping Jettison's Mapped reader and writer. Serializes object from
@@ -134,8 +130,8 @@ public class JettisonMappedXmlDriver extends AbstractDriver {
         InputStream instream = null;
         try {
             instream = in.openStream();
-            return new StaxReader(new QNameMap(), mif.createXMLStreamReader(
-                    in.toExternalForm(), instream), getNameCoder());
+            return new StaxReader(
+                    new QNameMap(), mif.createXMLStreamReader(in.toExternalForm(), instream), getNameCoder());
         } catch (final XMLStreamException e) {
             throw new StreamException(e);
         } catch (IOException e) {
@@ -155,9 +151,8 @@ public class JettisonMappedXmlDriver extends AbstractDriver {
         InputStream instream = null;
         try {
             instream = new FileInputStream(in);
-            return new StaxReader(new QNameMap(), mif.createXMLStreamReader(in
-                    .toURI()
-                    .toASCIIString(), instream), getNameCoder());
+            return new StaxReader(
+                    new QNameMap(), mif.createXMLStreamReader(in.toURI().toASCIIString(), instream), getNameCoder());
         } catch (final XMLStreamException e) {
             throw new StreamException(e);
         } catch (IOException e) {
@@ -176,7 +171,8 @@ public class JettisonMappedXmlDriver extends AbstractDriver {
     public HierarchicalStreamWriter createWriter(final Writer writer) {
         try {
             if (useSerializeAsArray) {
-                return new JettisonStaxWriter(new QNameMap(), mof.createXMLStreamWriter(writer), getNameCoder(), convention);
+                return new JettisonStaxWriter(
+                        new QNameMap(), mof.createXMLStreamWriter(writer), getNameCoder(), convention);
             } else {
                 return new StaxWriter(new QNameMap(), mof.createXMLStreamWriter(writer), getNameCoder());
             }
@@ -188,7 +184,8 @@ public class JettisonMappedXmlDriver extends AbstractDriver {
     public HierarchicalStreamWriter createWriter(final OutputStream output) {
         try {
             if (useSerializeAsArray) {
-                return new JettisonStaxWriter(new QNameMap(), mof.createXMLStreamWriter(output), getNameCoder(), convention);
+                return new JettisonStaxWriter(
+                        new QNameMap(), mof.createXMLStreamWriter(output), getNameCoder(), convention);
             } else {
                 return new StaxWriter(new QNameMap(), mof.createXMLStreamWriter(output), getNameCoder());
             }
@@ -196,5 +193,4 @@ public class JettisonMappedXmlDriver extends AbstractDriver {
             throw new StreamException(e);
         }
     }
-
 }

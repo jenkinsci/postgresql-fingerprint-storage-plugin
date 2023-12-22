@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2020, Jenkins project contributors
+ * Copyright (c) 2023, Jenkins project contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,22 +27,17 @@ import com.thoughtworks.xstream.converters.basic.DateConverter;
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.model.Fingerprint;
+import java.sql.ResultSet;
+import java.sql.Timestamp;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Logger;
-
 
 /**
  * Helper class for handling converting of data from and to different data structures.
@@ -84,9 +79,10 @@ public class DataConversion {
      * @param facets See {@link DataConversion#extractFacets(String)}
      * @return
      */
-    static @NonNull String constructFingerprintJSON(@NonNull Map<String, String> fingerprintMetadata,
-                                           @NonNull Map<String, Fingerprint.RangeSet> usageMetadata,
-                                           @NonNull JSONArray facets) {
+    static @NonNull String constructFingerprintJSON(
+            @NonNull Map<String, String> fingerprintMetadata,
+            @NonNull Map<String, Fingerprint.RangeSet> usageMetadata,
+            @NonNull JSONArray facets) {
         JSONObject json = new JSONObject();
         JSONObject fingerprint = new JSONObject();
         JSONArray md5sum = new JSONArray();
@@ -139,11 +135,12 @@ public class DataConversion {
     /**
      * Store Fingerprint metadata into a Map.
      */
-    static @NonNull Map<String,String> extractFingerprintMetadata(@NonNull String id,
-                                                                  Timestamp timestamp,
-                                                                  @NonNull String filename,
-                                                                  @CheckForNull String originalJobName,
-                                                                  @CheckForNull String originalJobBuildNumber) {
+    static @NonNull Map<String, String> extractFingerprintMetadata(
+            @NonNull String id,
+            Timestamp timestamp,
+            @NonNull String filename,
+            @CheckForNull String originalJobName,
+            @CheckForNull String originalJobBuildNumber) {
         Map<String, String> fingerprintMetadata = new HashMap<>();
 
         fingerprintMetadata.put(TIMESTAMP, DATE_CONVERTER.toString(new Date(timestamp.getTime())));
@@ -179,7 +176,7 @@ public class DataConversion {
                 }
             }
         }
-        
+
         return Collections.unmodifiableMap(usageMetadata);
     }
 
@@ -213,5 +210,4 @@ public class DataConversion {
         facetsArray.put(facetsObject);
         return facetsArray;
     }
-
 }

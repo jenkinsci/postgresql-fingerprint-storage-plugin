@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2020, Jenkins project contributors
+ * Copyright (c) 2023, Jenkins project contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,18 +23,17 @@
  */
 package io.jenkins.plugins.postgresql;
 
-import com.thoughtworks.xstream.converters.basic.DateConverter;
-import hudson.Util;
-import org.junit.Test;
-
-import java.sql.Timestamp;
-import java.util.Date;
-import java.util.Map;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
+
+import com.thoughtworks.xstream.converters.basic.DateConverter;
+import hudson.Util;
+import java.sql.Timestamp;
+import java.util.Date;
+import java.util.Map;
+import org.junit.jupiter.api.Test;
 
 public class DataConversionTest {
 
@@ -52,21 +51,24 @@ public class DataConversionTest {
 
     @Test
     public void testExtractFingerprintMetadata() {
-        Map<String,String> fingerprintMetadata = DataConversion.extractFingerprintMetadata(
+        Map<String, String> fingerprintMetadata = DataConversion.extractFingerprintMetadata(
                 FINGERPRINT_ID, TIMESTAMP, FILENAME, JOB, String.valueOf(BUILD_NUMBER));
         assertThat(fingerprintMetadata.get(DataConversion.ID), is(equalTo(FINGERPRINT_ID)));
-        assertThat(fingerprintMetadata.get(DataConversion.TIMESTAMP), is(equalTo(DATE_CONVERTER.toString(
-                new Date(TIMESTAMP.getTime())))));
+        assertThat(
+                fingerprintMetadata.get(DataConversion.TIMESTAMP),
+                is(equalTo(DATE_CONVERTER.toString(new Date(TIMESTAMP.getTime())))));
         assertThat(fingerprintMetadata.get(DataConversion.FILENAME), is(equalTo(FILENAME)));
         assertThat(fingerprintMetadata.get(DataConversion.ORIGINAL_JOB_NAME), is(equalTo(JOB)));
-        assertThat(fingerprintMetadata.get(DataConversion.ORIGINAL_JOB_BUILD_NUMBER), is(equalTo(String.valueOf(
-                BUILD_NUMBER))));
+        assertThat(
+                fingerprintMetadata.get(DataConversion.ORIGINAL_JOB_BUILD_NUMBER),
+                is(equalTo(String.valueOf(BUILD_NUMBER))));
 
-        fingerprintMetadata = DataConversion.extractFingerprintMetadata(
-                FINGERPRINT_ID, TIMESTAMP, FILENAME, null, null);
+        fingerprintMetadata =
+                DataConversion.extractFingerprintMetadata(FINGERPRINT_ID, TIMESTAMP, FILENAME, null, null);
         assertThat(fingerprintMetadata.get(DataConversion.ID), is(equalTo(FINGERPRINT_ID)));
-        assertThat(fingerprintMetadata.get(DataConversion.TIMESTAMP), is(equalTo(DATE_CONVERTER.toString(new Date(
-                TIMESTAMP.getTime())))));
+        assertThat(
+                fingerprintMetadata.get(DataConversion.TIMESTAMP),
+                is(equalTo(DATE_CONVERTER.toString(new Date(TIMESTAMP.getTime())))));
         assertThat(fingerprintMetadata.get(DataConversion.FILENAME), is(equalTo(FILENAME)));
         assertThat(fingerprintMetadata.get(DataConversion.ORIGINAL_JOB_NAME), is(nullValue()));
         assertThat(fingerprintMetadata.get(DataConversion.ORIGINAL_JOB_BUILD_NUMBER), is(nullValue()));

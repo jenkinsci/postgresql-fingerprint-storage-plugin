@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2020, Jenkins project contributors
+ * Copyright (c) 2023, Jenkins project contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,13 +23,15 @@
  */
 package io.jenkins.plugins.postgresql;
 
-import org.kohsuke.accmod.Restricted;
-import org.kohsuke.accmod.restrictions.NoExternalUse;
-
+import io.jenkins.plugins.postgresql.PostgreSQLFingerprintStorage.ConnectionSupplier;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.kohsuke.accmod.Restricted;
+import org.kohsuke.accmod.restrictions.NoExternalUse;
 
 /**
  * Handles PostgreSQL schema initialization.
@@ -37,25 +39,21 @@ import java.sql.SQLException;
 @Restricted(NoExternalUse.class)
 public class PostgreSQLSchemaInitialization {
 
+    private static final Logger LOGGER = Logger.getLogger(PostgreSQLSchemaInitialization.class.getName());
+
     static synchronized void performSchemaInitialization(PostgreSQLFingerprintStorage postgreSQLFingerprintStorage) {
-        performSchemaInitialization(postgreSQLFingerprintStorage.getHost(), postgreSQLFingerprintStorage.getPort(),
-                postgreSQLFingerprintStorage.getDatabaseName(), postgreSQLFingerprintStorage.getCredentialsId(),
-                postgreSQLFingerprintStorage.getSsl(), postgreSQLFingerprintStorage.getConnectionTimeout(),
-                postgreSQLFingerprintStorage.getSocketTimeout());
+        performSchemaInitialization(postgreSQLFingerprintStorage.getConnectionSupplier());
     }
 
     /**
      * Responsible for creating the fingerprint schema in PostgreSQL if it doesn't already exist.
      */
-    static synchronized void performSchemaInitialization(String host, int port, String databaseName,
-                                                         String credentialsId, boolean ssl, int connectionTimeout,
-                                                         int socketTimeout) {
-        try (Connection connection = PostgreSQLConnection.getConnection(host, port, databaseName, credentialsId, ssl,
-                connectionTimeout, socketTimeout)) {
+    static synchronized void performSchemaInitialization(ConnectionSupplier connectionSupplier) {
+        try (Connection connection = connectionSupplier.connection()) {
             connection.setAutoCommit(false);
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CHECK_SCHEMA_EXISTS))) {
+            try (PreparedStatement preparedStatement =
+                    connection.prepareStatement(Queries.getQuery(Queries.CHECK_SCHEMA_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
                 boolean schemaExists = false;
                 if (resultSet.next()) {
@@ -69,15 +67,15 @@ public class PostgreSQLSchemaInitialization {
 
             // Create schema
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
+            try (PreparedStatement preparedStatement =
+                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_SCHEMA))) {
                 preparedStatement.execute();
             }
 
             // Create fingerprint table
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
+            try (PreparedStatement preparedStatement =
+                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
                 preparedStatement.execute();
             }
 
@@ -95,20 +93,20 @@ public class PostgreSQLSchemaInitialization {
 
             // Create fingerprint facet relation table
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
+            try (PreparedStatement preparedStatement =
+                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
                 preparedStatement.execute();
             }
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_INDEX))) {
+            try (PreparedStatement preparedStatement =
+                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_INDEX))) {
                 preparedStatement.execute();
             }
 
             connection.commit();
-        } catch (SQLException ignored) {
-
+            LOGGER.log(Level.INFO, "Successfully initialized PostgreSQL schema");
+        } catch (SQLException e) {
+            LOGGER.log(Level.WARNING, "Failed to initialize PostgreSQL schema", e);
         }
     }
-
 }

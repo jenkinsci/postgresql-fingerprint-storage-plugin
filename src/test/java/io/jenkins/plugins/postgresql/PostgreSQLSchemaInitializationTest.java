@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright (c) 2020, Jenkins project contributors
+ * Copyright (c) 2023, Jenkins project contributors
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,53 +23,66 @@
  */
 package io.jenkins.plugins.postgresql;
 
-import hudson.Util;
-import hudson.model.Fingerprint;
-import org.hamcrest.Matchers;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import org.jvnet.hudson.test.JenkinsRule;
-import org.testcontainers.containers.PostgreSQLContainer;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNot.not;
 
+import hudson.Util;
+import hudson.model.Fingerprint;
+import hudson.util.Secret;
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import jenkins.fingerprints.GlobalFingerprintConfiguration;
+import org.hamcrest.Matchers;
+import org.jenkinsci.plugins.database.GlobalDatabaseConfiguration;
+import org.jenkinsci.plugins.database.postgresql.PostgreSQLDatabase;
+import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.JenkinsRule;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
+import org.testcontainers.containers.PostgreSQLContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+
+@WithJenkins
+@Testcontainers
 public class PostgreSQLSchemaInitializationTest {
 
-    @Rule
-    public JenkinsRule j = new JenkinsRule();
+    @Container
+    public PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE);
 
-    @Rule
-    public PostgreSQLContainer postgres = new PostgreSQLContainer();
-
-    @Before
-    public void setConfiguration() throws Exception {
-        PostgreSQLConfiguration.setConfiguration(postgres.getUsername(), postgres.getPassword(), postgres.getHost(),
-                postgres.getFirstMappedPort(), postgres.getDatabaseName());
+    public void setConfiguration() throws IOException {
+        PostgreSQLDatabase database = new PostgreSQLDatabase(
+                postgres.getHost() + ":" + postgres.getMappedPort(5432),
+                postgres.getDatabaseName(),
+                postgres.getUsername(),
+                Secret.fromString(postgres.getPassword()),
+                null);
+        database.setValidationQuery("SELECT 1");
+        GlobalDatabaseConfiguration.get().setDatabase(database);
+        PostgreSQLFingerprintStorage postgreSQLFingerprintStorage = PostgreSQLFingerprintStorage.get();
+        GlobalFingerprintConfiguration.get().setStorage(postgreSQLFingerprintStorage);
+        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
     }
 
     @Test
-    public void testSchemaInitialization() throws Exception {
+    public void testSchemaInitialization(JenkinsRule rule) throws Exception {
+        setConfiguration();
         PostgreSQLFingerprintStorage postgreSQLFingerprintStorage = PostgreSQLFingerprintStorage.get();
-        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
 
-        try (Connection connection = PostgreSQLConnection.getConnection(PostgreSQLFingerprintStorage.get())) {
+        try (Connection connection =
+                postgreSQLFingerprintStorage.getConnectionSupplier().connection()) {
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CHECK_SCHEMA_EXISTS))) {
+            try (PreparedStatement preparedStatement =
+                    connection.prepareStatement(Queries.getQuery(Queries.CHECK_SCHEMA_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
                 assertThat(resultSet.getInt(ColumnName.TOTAL), is(1));
             }
 
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CHECK_FINGERPRINT_TABLE_EXISTS))) {
+            try (PreparedStatement preparedStatement =
+                    connection.prepareStatement(Queries.getQuery(Queries.CHECK_FINGERPRINT_TABLE_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
                 assertThat(resultSet.next(), is(true));
                 assertThat(resultSet.getInt(ColumnName.TOTAL), is(1));
@@ -92,15 +105,16 @@ public class PostgreSQLSchemaInitializationTest {
     }
 
     @Test
-    public void testSchemaIntializationDoesNotDeleteData() throws Exception {
+    public void testSchemaIntializationDoesNotDeleteData(JenkinsRule rule) throws Exception {
+        setConfiguration();
         PostgreSQLFingerprintStorage postgreSQLFingerprintStorage = PostgreSQLFingerprintStorage.get();
-        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
 
         String id = Util.getDigestOf("testSchemaIntializationDoesNotDeleteData");
         Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
         fingerprintSaved.add(id, 3);
-        fingerprintSaved.getPersistedFacets().add(new PostgreSQLFingerprintStorageTest.TestFacet(
-                fingerprintSaved, 3, id));
+        fingerprintSaved
+                .getPersistedFacets()
+                .add(new PostgreSQLFingerprintStorageTest.TestFacet(fingerprintSaved, 3, id));
 
         PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
 
@@ -110,15 +124,16 @@ public class PostgreSQLSchemaInitializationTest {
     }
 
     @Test
-    public void testSchemaIntializationTwice() throws Exception {
+    public void testSchemaIntializationTwice(JenkinsRule rule) throws Exception {
+        setConfiguration();
         PostgreSQLFingerprintStorage postgreSQLFingerprintStorage = PostgreSQLFingerprintStorage.get();
-        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
 
         String id = Util.getDigestOf("testSchemaIntializationDoesNotDeleteData");
         Fingerprint fingerprintSaved = new Fingerprint(null, "foo.jar", Util.fromHexString(id));
         fingerprintSaved.add(id, 3);
-        fingerprintSaved.getPersistedFacets().add(new PostgreSQLFingerprintStorageTest.TestFacet(
-                fingerprintSaved, 3, id));
+        fingerprintSaved
+                .getPersistedFacets()
+                .add(new PostgreSQLFingerprintStorageTest.TestFacet(fingerprintSaved, 3, id));
 
         PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
         PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
@@ -127,5 +142,4 @@ public class PostgreSQLSchemaInitializationTest {
         assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));
         assertThat(fingerprintLoaded.toString(), is(Matchers.equalTo(fingerprintSaved.toString())));
     }
-
 }

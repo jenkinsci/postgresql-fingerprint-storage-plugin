@@ -54,24 +54,20 @@ cd plugin mvn hpi:run
 Once the plugin has been installed, you can configure the PostgreSQL
 server details by following the steps below:
 
+Ensure you have PostgreSQL as global database. Plugin will not work for other database engine.
+
 1.  Select `Manage Jenkins`
 2.  Select `Configure System`
-3.  Scroll to the section `Fingerprints`
-4.  Select `PostgreSQL Fingerprint Storage` from the dropdown for
+
+![image](docs/images/database_config.png)
+
+4.  Save the config
+4.  Scroll to the section `Fingerprints`
+5.  Select `PostgreSQL Fingerprint Storage` from the dropdown for
     Fingerprint Storage Engine and fill in the required details:
 
 ![image](docs/images/config_page.png)
 
-- `Host` - Enter hostname where PostgreSQL is running
-- `Port` - Specify the port on which PostgreSQL is running
-- `Database Name` - Specify the database name inside the PostgreSQL
-  instance to be used. Please note that the database will not be created
-  by the plugin, the user has to create the database.
-- `SSL` - Click if SSL is enabled
-- `Connection Timeout` - Set the connection timeout duration in seconds.
-- `Socket Timeout` - Set the socket timeout duration in seconds.
-- `Credentials` - Configure authentication using username and password
-  to the PostgreSQL instance.
   1.  Use the `Test PostgreSQL Connection` to verify that the details
       are correct and Jenkins is able to connect to the PostgreSQL
       instance.
