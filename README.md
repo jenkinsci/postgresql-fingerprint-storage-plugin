@@ -117,12 +117,6 @@ We use Jenkins [Jira](https://issues.jenkins-ci.org/) to track issues.
 Feel free to file issues under `postgresql-fingerprint-storage-plugin`
 component.
 
-# Attribution
-
-The source code includes `JettisonMappedXmlDriver` and
-`JettisonStaxWriter` which have been taken from
-<http://x-stream.github.io/>.
-
 # References
 
 - [JEP-226](https://github.com/jenkinsci/jep/tree/master/jep/226)
