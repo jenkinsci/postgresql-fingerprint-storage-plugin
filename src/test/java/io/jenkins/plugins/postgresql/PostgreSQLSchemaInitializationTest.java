@@ -63,7 +63,7 @@ public class PostgreSQLSchemaInitializationTest {
         GlobalDatabaseConfiguration.get().setDatabase(database);
         PostgreSQLFingerprintStorage postgreSQLFingerprintStorage = PostgreSQLFingerprintStorage.get();
         GlobalFingerprintConfiguration.get().setStorage(postgreSQLFingerprintStorage);
-        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
+        DatabaseSchemaLoader.migrateSchema();
     }
 
     @Test
@@ -109,8 +109,6 @@ public class PostgreSQLSchemaInitializationTest {
                 .getPersistedFacets()
                 .add(new PostgreSQLFingerprintStorageTest.TestFacet(fingerprintSaved, 3, id));
 
-        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
-
         Fingerprint fingerprintLoaded = Fingerprint.load(id);
         assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));
         assertThat(fingerprintLoaded.toString(), is(Matchers.equalTo(fingerprintSaved.toString())));
@@ -127,9 +125,6 @@ public class PostgreSQLSchemaInitializationTest {
         fingerprintSaved
                 .getPersistedFacets()
                 .add(new PostgreSQLFingerprintStorageTest.TestFacet(fingerprintSaved, 3, id));
-
-        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
-        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
 
         Fingerprint fingerprintLoaded = Fingerprint.load(id);
         assertThat(fingerprintLoaded, is(not(Matchers.nullValue())));

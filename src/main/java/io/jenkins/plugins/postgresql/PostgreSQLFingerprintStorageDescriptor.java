@@ -24,15 +24,9 @@
 package io.jenkins.plugins.postgresql;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.util.FormValidation;
-import jenkins.fingerprints.FingerprintStorage;
 import jenkins.fingerprints.FingerprintStorageDescriptor;
-import jenkins.model.Jenkins;
-import org.jenkinsci.plugins.database.Database;
-import org.jenkinsci.plugins.database.GlobalDatabaseConfiguration;
 import org.kohsuke.accmod.Restricted;
 import org.kohsuke.accmod.restrictions.NoExternalUse;
-import org.kohsuke.stapler.interceptor.RequirePOST;
 
 /**
  * Descriptor class for {@link PostgreSQLFingerprintStorage}.
@@ -40,34 +34,8 @@ import org.kohsuke.stapler.interceptor.RequirePOST;
 @Restricted(NoExternalUse.class)
 public class PostgreSQLFingerprintStorageDescriptor extends FingerprintStorageDescriptor {
 
-    private static final String SUCCESS = "Success";
-
     @Override
     public @NonNull String getDisplayName() {
         return Messages.PostgreSQLFingerprintStorage_DisplayName();
-    }
-
-    @RequirePOST
-    @Restricted(NoExternalUse.class)
-    public FormValidation doInitializePostgreSQL() {
-        if (!Jenkins.get().hasPermission(Jenkins.ADMINISTER)) {
-            return FormValidation.error("Need admin permission to perform this action");
-        }
-        try {
-            FingerprintStorage fingerprintStorage = FingerprintStorage.get();
-            if (fingerprintStorage instanceof PostgreSQLFingerprintStorage) {
-                Database database = GlobalDatabaseConfiguration.get().getDatabase();
-                if (database == null) {
-                    return FormValidation.error("No database configured on global configuration");
-                }
-                PostgreSQLFingerprintStorage postgreSQLFingerprintStorage =
-                        (PostgreSQLFingerprintStorage) fingerprintStorage;
-                PostgreSQLSchemaInitialization.performSchemaInitialization(
-                        postgreSQLFingerprintStorage.getConnectionSupplier());
-            }
-            return FormValidation.ok(SUCCESS);
-        } catch (Exception e) {
-            return FormValidation.error("Schema initialization failed." + e.getMessage());
-        }
     }
 }

@@ -83,10 +83,7 @@ Ensure you have PostgreSQL as global database. Plugin will not work for other da
 ## Using Jenkins Configuration as Code Plugin (JCasC)
 
 The plugin can also be configured using the [configuration as code
-plugin](https://github.com/jenkinsci/configuration-as-code-plugin) but
-there is one caveat at the moment. The schema for the PostgreSQL
-instance has to be initialized by going to the configuration page, as
-mentioned in the previous section.
+plugin](https://github.com/jenkinsci/configuration-as-code-plugin)
 
 A sample YAML file is provided below for configuring this plugin using
 JCasC:

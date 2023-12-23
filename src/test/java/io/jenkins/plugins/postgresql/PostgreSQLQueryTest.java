@@ -29,15 +29,20 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 
 import hudson.Util;
+import hudson.util.Secret;
+import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
+import jenkins.fingerprints.GlobalFingerprintConfiguration;
+import org.jenkinsci.plugins.database.GlobalDatabaseConfiguration;
+import org.jenkinsci.plugins.database.postgresql.PostgreSQLDatabase;
 import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
+import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
@@ -57,19 +62,28 @@ public class PostgreSQLQueryTest {
     @Container
     public PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(PostgreSQLContainer.IMAGE);
 
-    private Connection getConnection() throws SQLException {
-        return DriverManager.getConnection(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword());
+    public void setConfiguration() throws IOException {
+        PostgreSQLDatabase database = new PostgreSQLDatabase(
+                postgres.getHost() + ":" + postgres.getMappedPort(5432),
+                postgres.getDatabaseName(),
+                postgres.getUsername(),
+                Secret.fromString(postgres.getPassword()),
+                null);
+        database.setValidationQuery("SELECT 1");
+        GlobalDatabaseConfiguration.get().setDatabase(database);
+        PostgreSQLFingerprintStorage postgreSQLFingerprintStorage = PostgreSQLFingerprintStorage.get();
+        GlobalFingerprintConfiguration.get().setStorage(postgreSQLFingerprintStorage);
+        DatabaseSchemaLoader.migrateSchema();
+    }
+
+    private Connection getConnection() throws SQLException, IOException {
+        return PostgreSQLFingerprintStorage.get().getConnectionSupplier().connection();
     }
 
     @Test
-    public void testCreateFingerprintTable() throws SQLException {
+    public void testCreateFingerprintTable(JenkinsRule rule) throws SQLException, IOException {
+        setConfiguration();
         try (Connection connection = getConnection()) {
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
-                preparedStatement.execute();
-            }
-
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.CHECK_FINGERPRINT_TABLE_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
@@ -80,19 +94,9 @@ public class PostgreSQLQueryTest {
     }
 
     @Test
-    public void testCreateFingerprintJobBuildRelationTable() throws SQLException {
+    public void testCreateFingerprintJobBuildRelationTable(JenkinsRule rule) throws SQLException, IOException {
+        setConfiguration();
         try (Connection connection = getConnection()) {
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE))) {
-                preparedStatement.execute();
-            }
-
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery(Queries.CHECK_FINGERPRINT_JOB_BUILD_RELATION_TABLE_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
@@ -103,19 +107,9 @@ public class PostgreSQLQueryTest {
     }
 
     @Test
-    public void testCreateFingerprintFacetRelationTable() throws SQLException {
+    public void testCreateFingerprintFacetRelationTable(JenkinsRule rule) throws SQLException, IOException {
+        setConfiguration();
         try (Connection connection = getConnection()) {
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
-                preparedStatement.execute();
-            }
-
             try (PreparedStatement preparedStatement = connection.prepareStatement(
                     Queries.getQuery(Queries.CHECK_FINGERPRINT_FACET_RELATION_TABLE_EXISTS))) {
                 ResultSet resultSet = preparedStatement.executeQuery();
@@ -126,24 +120,9 @@ public class PostgreSQLQueryTest {
     }
 
     @Test
-    public void testInsertAndSelectFingerprint() throws SQLException {
+    public void testInsertAndSelectFingerprint(JenkinsRule rule) throws SQLException, IOException {
+        setConfiguration();
         try (Connection connection = getConnection()) {
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
-                preparedStatement.execute();
-            }
-
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.INSERT_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
@@ -173,24 +152,9 @@ public class PostgreSQLQueryTest {
     }
 
     @Test
-    public void testInsertAndSelectFingerprintJobBuildRelation() throws SQLException {
+    public void testInsertAndSelectFingerprintJobBuildRelation(JenkinsRule rule) throws SQLException, IOException {
+        setConfiguration();
         try (Connection connection = getConnection()) {
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
-                preparedStatement.execute();
-            }
-
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.INSERT_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
@@ -233,24 +197,9 @@ public class PostgreSQLQueryTest {
     }
 
     @Test
-    public void testInsertAndSelectFingerprintFacetRelation() throws SQLException {
+    public void testInsertAndSelectFingerprintFacetRelation(JenkinsRule rule) throws SQLException, IOException {
+        setConfiguration();
         try (Connection connection = getConnection()) {
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
-                preparedStatement.execute();
-            }
-
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.INSERT_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);
@@ -297,24 +246,9 @@ public class PostgreSQLQueryTest {
     }
 
     @Test
-    public void testDeleteFingerprint() throws SQLException {
+    public void testDeleteFingerprint(JenkinsRule rule) throws SQLException, IOException {
+        setConfiguration();
         try (Connection connection = getConnection()) {
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_TABLE))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement = connection.prepareStatement(
-                    Queries.getQuery(Queries.CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE))) {
-                preparedStatement.execute();
-            }
-
-            try (PreparedStatement preparedStatement =
-                    connection.prepareStatement(Queries.getQuery(Queries.CREATE_FINGERPRINT_FACET_RELATION_TABLE))) {
-                preparedStatement.execute();
-            }
-
             try (PreparedStatement preparedStatement =
                     connection.prepareStatement(Queries.getQuery(Queries.INSERT_FINGERPRINT))) {
                 preparedStatement.setString(1, FINGERPRINT_ID);

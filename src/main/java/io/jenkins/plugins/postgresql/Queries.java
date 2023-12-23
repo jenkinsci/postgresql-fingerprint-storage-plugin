@@ -37,11 +37,6 @@ import org.kohsuke.accmod.restrictions.NoExternalUse;
 @Restricted(NoExternalUse.class)
 public class Queries {
 
-    static final String CREATE_FINGERPRINT_TABLE = "create_fingerprint_table";
-    static final String CREATE_FINGERPRINT_JOB_BUILD_RELATION_TABLE = "create_fingerprint_job_build_relation_table";
-    static final String CREATE_FINGERPRINT_JOB_BUILD_RELATION_INDEX = "create_fingerprint_job_build_relation_index";
-    static final String CREATE_FINGERPRINT_FACET_RELATION_TABLE = "create_fingerprint_facet_relation_table";
-    static final String CREATE_FINGERPRINT_FACET_RELATION_INDEX = "create_fingerprint_facet_relation_index";
     static final String INSERT_FINGERPRINT = "insert_fingerprint";
     static final String INSERT_FINGERPRINT_JOB_BUILD_RELATION = "insert_fingerprint_job_build_relation";
     static final String INSERT_FINGERPRINT_FACET_RELATION = "insert_fingerprint_facet_relation";
