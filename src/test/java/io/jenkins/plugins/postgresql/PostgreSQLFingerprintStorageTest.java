@@ -73,7 +73,7 @@ public class PostgreSQLFingerprintStorageTest {
         GlobalDatabaseConfiguration.get().setDatabase(database);
         PostgreSQLFingerprintStorage postgreSQLFingerprintStorage = PostgreSQLFingerprintStorage.get();
         GlobalFingerprintConfiguration.get().setStorage(postgreSQLFingerprintStorage);
-        PostgreSQLSchemaInitialization.performSchemaInitialization(postgreSQLFingerprintStorage);
+        DatabaseSchemaLoader.migrateSchema();
     }
 
     @Test

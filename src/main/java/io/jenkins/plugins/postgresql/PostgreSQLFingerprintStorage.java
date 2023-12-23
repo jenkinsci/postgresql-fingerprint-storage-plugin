@@ -241,6 +241,13 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
         protected Database database() {
             return GlobalDatabaseConfiguration.get().getDatabase();
         }
+
+        @Override
+        protected void initialize(Connection connection) throws SQLException {
+            if (!DatabaseSchemaLoader.MIGRATED) {
+                DatabaseSchemaLoader.migrateSchema();
+            }
+        }
     }
 
     abstract static class ConnectionSupplier implements AutoCloseable {
