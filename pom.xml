@@ -92,7 +92,7 @@ THE SOFTWARE.
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
       <artifactId>flyway-api</artifactId>
-      <version>9.22.3-19.v517419376361</version>
+      <version>9.22.3-35.v1ed612b_0c48a_</version>
     </dependency>
     <dependency>
       <groupId>io.jenkins.plugins</groupId>
