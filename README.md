@@ -6,6 +6,8 @@
 > It's configuration might change in future releases
 
 ![Build](https://ci.jenkins.io/job/Plugins/job/postgresql-fingerprint-storage-plugin/job/main/badge/icon)
+[![Coverage](https://ci.jenkins.io/job/Plugins/job/postgresql-fingerprint-storage-plugin/job/main/badge/icon?status=${instructionCoverage}&subject=coverage&color=${colorInstructionCoverage})](https://ci.jenkins.io/job/Plugins/job/postgresql-fingerprint-storage-plugin/job/main)
+[![LOC](https://ci.jenkins.io/job/Plugins/job/postgresql-fingerprint-storage-plugin/job/main/badge/icon?job=test&status=${lineOfCode}&subject=line%20of%20code&color=blue)](https://ci.jenkins.io/job/Plugins/job/postgresql-fingerprint-storage-plugin/job/main)
 ![Contributors](https://img.shields.io/github/contributors/jenkinsci/postgresql-fingerprint-storage-plugin.svg?color=blue)
 ![Gitter](https://badges.gitter.im/jenkinsci/external-fingerprint-storage.svg)
 [![GitHub release](https://img.shields.io/github/release/jenkinsci/postgresql-fingerprint-storage-plugin.svg?label=changelog)](https://github.com/jenkinsci/postgresql-fingerprint-storage-plugin/releases/latest)
