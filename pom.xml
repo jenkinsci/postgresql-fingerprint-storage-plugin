@@ -69,7 +69,7 @@ THE SOFTWARE.
     <configuration-as-code.version>1756.v2b_7eea_874392</configuration-as-code.version>
 
     <!-- Test dependencies version -->
-    <testcontainer.version>1.19.3</testcontainer.version>
+    <testcontainer.version>1.19.4</testcontainer.version>
 
   </properties>
   <dependencyManagement>
