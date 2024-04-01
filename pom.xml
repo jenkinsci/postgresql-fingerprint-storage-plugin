@@ -63,7 +63,7 @@ THE SOFTWARE.
   <properties>
     <changelist>999999-SNAPSHOT</changelist>
     <gitHubRepo>jenkinsci/postgresql-fingerprint-storage-plugin</gitHubRepo>
-    <jenkins.version>2.426.2</jenkins.version>
+    <jenkins.version>2.440.2</jenkins.version>
     <useBeta>true</useBeta>
     <spotless.check.skip>false</spotless.check.skip>
     <configuration-as-code.version>1775.v810dc950b_514</configuration-as-code.version>
