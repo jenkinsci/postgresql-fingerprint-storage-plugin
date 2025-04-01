@@ -25,7 +25,6 @@ package io.jenkins.plugins.postgresql;
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.Extension;
 import hudson.ExtensionList;
 import hudson.Util;
@@ -258,7 +257,6 @@ public class PostgreSQLFingerprintStorage extends FingerprintStorage {
 
         protected void initialize(Connection connection) throws SQLException {}
 
-        @SuppressFBWarnings(value = "IS2_INCONSISTENT_SYNC")
         synchronized Connection connection() throws SQLException {
             if (connection == null || connection.isClosed()) {
                 Connection _connection = database().getDataSource().getConnection();
