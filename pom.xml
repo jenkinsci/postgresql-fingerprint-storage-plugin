@@ -70,7 +70,7 @@ THE SOFTWARE.
     <spotless.check.skip>false</spotless.check.skip>
 
     <!-- Test dependencies version -->
-    <testcontainer.version>1.21.0</testcontainer.version>
+    <testcontainer.version>1.21.1</testcontainer.version>
 
   </properties>
   <dependencyManagement>
