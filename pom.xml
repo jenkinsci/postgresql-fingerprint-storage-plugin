@@ -72,7 +72,7 @@ THE SOFTWARE.
     <hpi.strictBundledArtifacts>true</hpi.strictBundledArtifacts>
 
     <!-- Test dependencies version -->
-    <testcontainer.version>2.0.4</testcontainer.version>
+    <testcontainer.version>2.0.5</testcontainer.version>
     <ban-commons-lang-2.skip>false</ban-commons-lang-2.skip>
     <ban-deprecated-stapler.skip>false</ban-deprecated-stapler.skip>
 
