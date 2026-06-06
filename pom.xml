@@ -75,6 +75,7 @@ THE SOFTWARE.
     <testcontainer.version>2.0.5</testcontainer.version>
     <ban-commons-lang-2.skip>false</ban-commons-lang-2.skip>
     <ban-deprecated-stapler.skip>false</ban-deprecated-stapler.skip>
+    <banObsoleteDependencyOverrides.skip>false</banObsoleteDependencyOverrides.skip>
 
   </properties>
   <dependencyManagement>
